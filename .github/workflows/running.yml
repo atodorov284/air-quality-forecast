@@ -1,0 +1,26 @@
+name: Running code
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-reproducibility:
+    runs-on: ubuntu-latest
+    permissions: write-all
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run setup script
+        run: pip3 install -r requirements.txt
+
+      - name: Run main.py
+        id: run_main
+        run: |
+          set +e
+          python3 main.py
+          exit_code=$?
+          echo "EXIT_CODE=${exit_code}" >> $GITHUB_OUTPUT
