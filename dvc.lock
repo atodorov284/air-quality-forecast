@@ -1,9 +1,0 @@
-schema: '2.0'
-stages:
-  train:
-    cmd: python air-quality-forecast\__init__.py
-    deps:
-    - path: air-quality-forecast\__init__.py
-      hash: md5
-      md5: a5e4d1e9e217b3798b8dd8d379609c1f
-      size: 505
