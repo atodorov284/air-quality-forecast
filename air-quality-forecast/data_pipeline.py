@@ -2,6 +2,7 @@ import pandas as pd
 import os
 
 from utils import FeatureSelector
+from sklearn.preprocessing import MinMaxScaler
 
 
 class PreprocessingPipeline:
@@ -120,7 +121,10 @@ class PreprocessingPipeline:
     
         return data
     
-    
+    def normalize_data(self, data, normalizer_type = ""):
+        if normalizer_type == "":
+            ss = MinMaxScaler()
+        
 
     def save_to_csv(self, name, data, path):
         """
