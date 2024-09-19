@@ -27,4 +27,3 @@ class FeatureSelector:
         selected_columns = [item for item in selected_columns if item not in to_remove]
         return selected_columns
  
-    
