@@ -95,7 +95,8 @@ class PreprocessingPipeline:
         Applies the time shift to the dataset and adds the shifted columns.
 
         :param data: Raw data as a Pandas DataFrame
-        :param t_max: Maximum time shift
+        :param t_max: Maximum time shift, representing the number of days used
+        to predict the next 3 days
         :return: Data with time shifted columns as a Pandas DataFrame
         """
         all_cols = data.columns 
@@ -105,7 +106,7 @@ class PreprocessingPipeline:
                 data[[f'{col} - day {t}']] = data[[col]].shift(-t)
 
         # Apply time shift to the labels
-        for t in range(1,t_max):
+        for t in range(1,3):
             for col in ['o3', 'no2']:
                 data[[f'{col} + day {t}']] = data[[col]].shift(t)
 
