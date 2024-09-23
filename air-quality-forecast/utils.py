@@ -1,10 +1,6 @@
 import pandas as pd
 import os
 
-"""
-File with utilities 
-"""
-
 
 class InputValidator:
     @staticmethod
