@@ -1,35 +1,10 @@
 import pandas as pd
 import os
-from utils import FeatureSelector
+from utils import FeatureSelector, InputValidator
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from sklearn.model_selection import train_test_split
 from typing import Tuple
-
-class InputValidator:
-    @staticmethod
-    def validate_type(value, expected_type, variable_name: str) -> None:
-        """
-        Validate the type of the given variable.
-        
-        :param value: The value to validate.
-        :param expected_type: The expected type of the value.
-        :param variable_name: The name of the variable for error messages.
-        :raises TypeError: If the value is not of the expected type.
-        """
-        if not isinstance(value, expected_type):
-            raise TypeError(f"{variable_name} must be of type {expected_type.__name__}.")
-    
-    @staticmethod
-    def validate_file_exists(path: str, variable_name: str) -> None:
-        """
-        Validate that the file path exists.
-
-        :param path: The file path to validate.
-        :param variable_name: The name of the variable for error messages.
-        :raises FileNotFoundError: If the path does not exist.
-        """
-        if not os.path.exists(path):
-            raise FileNotFoundError(f"{variable_name} path {path} does not exist.")
+import numpy as np
 
 class DataLoader:
     def __init__(self, raw_data_path: str, processed_data_path: str) -> None:
@@ -67,8 +42,11 @@ class DataLoader:
         :param data: The Pandas DataFrame to save as a CSV.
         """
         InputValidator.validate_type(name, str, "name")
-        InputValidator.validate_type(data, pd.DataFrame, "data")
-    
+        
+        # If the data is a numpy array, convert it to a Pandas DataFrame
+        if isinstance(data, np.ndarray):
+            data = pd.DataFrame(data)
+        
         data.to_csv(os.path.join(self.processed_data_path, name))
 
 
@@ -188,41 +166,6 @@ class FeatureProcessor:
         return self.preprocessed_data
 
 
-class Normalizer:
-    def normalize_data(self, data: pd.DataFrame, normalizer_type: str = "MinMax") -> pd.DataFrame:
-        """
-        Normalize the dataset using a specified normalizer.
-
-        :param data: The data to normalize as a Pandas DataFrame.
-        :param normalizer_type: The type of normalizer to use. Options are 'MinMax', 'Standard', and 'Robust'.
-        :return: The normalized data as a Pandas DataFrame.
-        """
-        InputValidator.validate_type(data, pd.DataFrame, "data")
-        InputValidator.validate_type(normalizer_type, str, "normalizer_type")
-
-        normalizers = {
-            "MinMax": MinMaxScaler,
-            "Standard": StandardScaler,
-            "Robust": RobustScaler
-        }
-
-        if normalizer_type not in normalizers:
-            raise ValueError(f"Invalid normalizer_type '{normalizer_type}'. Valid options are: 'MinMax', 'Standard', or 'Robust'.")
-    
-        scaler = normalizers[normalizer_type]()
-        return pd.DataFrame(scaler.fit_transform(data), columns=data.columns, index=data.index)
-
-    def __call__(self, data: pd.DataFrame, normalizer_type: str = "MinMax") -> pd.DataFrame:
-        """
-        Normalize the data when the class is called.
-
-        :param data: The data to normalize as a Pandas DataFrame.
-        :param normalizer_type: The type of normalizer to use.
-        :return: The normalized data as a Pandas DataFrame.
-        """
-        return self.normalize_data(data, normalizer_type)
-
-
 class PreprocessingPipeline:
     def __init__(self) -> None:
         """
@@ -234,16 +177,32 @@ class PreprocessingPipeline:
 
         self.data_loader = DataLoader(raw_data_path, processed_data_path)
         self.feature_processor = None
-        self.normalizer = Normalizer()
+        self.normalizer = MinMaxScaler()
+    
+    def train_test_validation_split(self, x: pd.DataFrame, y:pd.DataFrame,test_size_: float = 0.15, validation_size: float = 0.15, random_state_ = 4242) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        """
+        Split the data into training and testing sets.
 
-    def run_pipeline(self, normalizer_type: str = "MinMax") -> pd.DataFrame:
+        :param data: The data to split as a Pandas DataFrame.
+        :return: A tuple of the training and testing data as Pandas DataFrames.
+        """
+        InputValidator.validate_type(x, pd.DataFrame, "data")
+        InputValidator.validate_type(y, pd.DataFrame, "data")
+        InputValidator.validate_type(test_size_, float, "test_size")
+        InputValidator.validate_type(validation_size, float, "validation_size")
+        test_val_proportion = validation_size / (test_size_ + validation_size)  # Proportion of test to validation_size
+        x_train, x_test_val, y_train, y_test_val = train_test_split(x, y, test_size=(test_size_+validation_size), random_state=random_state_)
+        x_test, x_val, y_test, y_val = train_test_split(x_test_val, y_test_val, test_size=test_val_proportion, random_state=random_state_)
+
+        return x_train, x_test, x_val, y_train, y_test, y_val
+    
+    def run_pipeline(self) -> pd.DataFrame:
         """
         Run the entire preprocessing pipeline: load data, process features, normalize, and save to CSV.
 
         :param normalizer_type: The type of normalizer to use.
         :return: The final normalized Pandas DataFrame.
         """
-        InputValidator.validate_type(normalizer_type, str, "normalizer_type")
         
         # Step 1: Load raw data
         griftpark_data, utrecht_data = self.data_loader()
@@ -252,16 +211,34 @@ class PreprocessingPipeline:
         self.feature_processor = FeatureProcessor(griftpark_data, utrecht_data)
         preprocessed_data = self.feature_processor()
 
-        # Step 3: Normalize data
-        # normalized_data = self.normalizer(preprocessed_data, normalizer_type)
+        # Step 3: Save processed data
+        self.data_loader.save_to_csv('v3_lagged_no_missing_predicted_data.csv', preprocessed_data)
+
+        # Step 4: Split data into train, test, and validation sets
+        columns_to_predict = ['no2', 'o3', 'no2 + day 1', 'o3 + day 1', 'no2 + day 2', 'o3 + day 2']
+        x = preprocessed_data.drop(columns_to_predict, axis=1)
+        y = preprocessed_data[columns_to_predict]
+        x_train, x_test, x_val, y_train, y_test, y_val = self.train_test_validation_split(x, y)
+
+        # Step 5: Normalize data for 3 sets (x_train, x_test, x_val)
+        x_train[x_train.columns] = self.normalizer.fit_transform(x_train[x_train.columns])
+        x_test[x_test.columns] = self.normalizer.transform(x_test[x_test.columns])
+        x_val[x_val.columns] = self.normalizer.transform(x_val[x_val.columns])
+
+        # Convert the normalized NumPy array back to a DataFrame
+        # normalized_x_train = pd.DataFrame(x_train, columns=preprocessed_data.columns, index=preprocessed_data.index)
+
+
+        #Step 6: Save normalized data
+        self.data_loader.save_to_csv('x_train.csv', x_train)
+        self.data_loader.save_to_csv('x_test.csv', x_test)
+        self.data_loader.save_to_csv('x_val.csv', x_val)
+        self.data_loader.save_to_csv('y_train.csv', y_train)
+        self.data_loader.save_to_csv('y_test.csv', y_test)
+        self.data_loader.save_to_csv('y_val.csv', y_val)        
 
         # Convert the normalized NumPy array back to a DataFrame
         # normalized_df = pd.DataFrame(normalized_data, columns=preprocessed_data.columns, index=preprocessed_data.index)
 
-        # Step 4: Save processed data
-        self.data_loader.save_to_csv('test.csv', preprocessed_data)
-
         return preprocessed_data
 
-pipeline = PreprocessingPipeline()
-pipeline.run_pipeline(normalizer_type="MinMax")
