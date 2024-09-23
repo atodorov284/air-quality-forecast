@@ -4,7 +4,15 @@
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-A short description of the project.
+Air pollution is a significant environmental concern, especially in urban areas, where the high levels of nitrogen dioxide and ozone can have a negative impact on human health, the ecosystem and on the overall quality of life. Given these risks, monitoring and forecasting the level of air pollution is an important task in order to allow for timely actions to reduce the harmful effects. 
+
+In the Netherlands, cities like Utrecht experience challenges concerning air quality due to urbanization, transportation, and industrial activities. Developing a system that can provide accurate and robust real-time air quality monitoring and reliable forecasts for future pollution levels would allow authorities and residents to take preventive measures and adjust their future activities based on expected air quality. This project focuses on the time-series forecasting of air pollution levels, specifically NO$_2$ and O$_3$ concentrations, for the next three days. This task can be framed as a regression problem, where the goal is to predict continuous values based on historical environmental data. Moreover, it provides infrastructure for real-time prediction, based on recent measurements.
+
+## How To Run This Code
+
+Currently, this repository is at the data engineering stage. To run the data pipeline, run main.py under air-quality-forecast, which contains the source code of this project. The processed and split datasets can be found under data/processed, namely x_train, x_val, x_test, y_train, y_val, y_test.
+
+The notebooks in this project were used as scratch for analysis and data merge and do not reflect our thorough methodology (source is under air-quality-forecast). Some extra scripts for the generation of our plots in the report can be found under extra_scripts.
 
 ## Project Organization
 
