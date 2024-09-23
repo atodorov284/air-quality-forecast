@@ -1,0 +1,167 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.17}
+
+\begin{document}
+
+% Load the dataset
+\pgfplotstableread[col sep=comma]{data/processed/v2_merged_selected_features_with_missing.csv}\datatable
+
+\begin{tikzpicture}
+
+% Main title at the top
+\node[align=center] at (7, 3.75) {\textbf{Distributions of Environmental Variables}};
+
+% First row of plots
+\begin{axis}[
+    at={(0,0)},
+    width=5.5cm,
+    xlabel=PM$_{2.5}$ ($\mu g /m^3$),
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    ylabel=Frequency,
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=1] {\datatable};
+\end{axis}
+
+\begin{axis}[
+    at={(5cm,0)},
+    width=5.5cm,
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    xlabel=PM$_{10}$ ($\mu g /m^3$),
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=2] {\datatable};
+\end{axis}
+
+\begin{axis}[
+    at={(10cm,0)},
+    width=5.5cm,
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    xlabel=O$_{3}$ ($\mu g /m^3$),
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=3] {\datatable};
+\end{axis}
+
+% Second row of plots
+\begin{axis}[
+    at={(0,-5cm)},
+    width=5.5cm,
+    xlabel=NO$_{2}$ ($\mu g /m^3$),
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    ylabel=Frequency,
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=4] {\datatable};
+\end{axis}
+
+\begin{axis}[
+    at={(5cm,-5cm)},
+    width=5.5cm,
+    xlabel=Temperature (°C),
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=5] {\datatable};
+\end{axis}
+
+\begin{axis}[
+    at={(10cm,-5cm)},
+    width=5.5cm,
+    xlabel=Humidity (\%),
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=6] {\datatable};
+\end{axis}
+
+% Third row of plots
+\begin{axis}[
+    at={(0,-10cm)},
+    width=5.5cm,
+    xlabel=Visibility ($km$),
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    ylabel=Frequency,
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=7] {\datatable};
+\end{axis}
+
+\begin{axis}[
+    at={(5cm,-10cm)},
+    width=5.5cm,
+    xlabel=Solar Radiation ($W/m^2$),
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=8] {\datatable};
+\end{axis}
+
+\begin{axis}[
+    at={(10cm,-10cm)},
+    width=5.5cm,
+    xlabel=Precipitation ($mm$),
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=9] {\datatable};
+\end{axis}
+
+\begin{axis}[
+    at={(2cm,-15cm)},
+    width=5.5cm,
+    xlabel=Windspeed ($km/h$),
+    ylabel=Frequency,
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=10] {\datatable};
+\end{axis}
+
+\begin{axis}[
+    at={(8cm,-15cm)},
+    width=5.5cm,
+    xlabel=Wind Direction (degrees),
+    tick label style={font=\fontsize{8}{8}\selectfont},
+    ybar=0pt, bar width=1,
+]
+\addplot+[fill=cyan,
+    fill opacity=0.5,
+    hist={bins=20}
+] table [y index=11] {\datatable};
+\end{axis}
+
+\end{tikzpicture}
+\end{document}
