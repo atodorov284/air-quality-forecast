@@ -1,9 +1,14 @@
 name: Style check
 
 on:
+  pull_request:
+    branches:
+      - main
+
   push:
     branches:
       - main
+      - data_engineering
 
 jobs:
   flake8_py3:
