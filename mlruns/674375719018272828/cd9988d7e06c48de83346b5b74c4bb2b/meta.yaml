@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/674375719018272828/cd9988d7e06c48de83346b5b74c4bb2b/artifacts
+end_time: 1727647645166
+entry_point_name: ''
+experiment_id: '674375719018272828'
+lifecycle_stage: active
+run_id: cd9988d7e06c48de83346b5b74c4bb2b
+run_name: languid-conch-979
+run_uuid: cd9988d7e06c48de83346b5b74c4bb2b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727647551952
+status: 3
+tags: []
+user_id: User
