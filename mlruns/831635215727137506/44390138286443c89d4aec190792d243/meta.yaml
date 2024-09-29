@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/User/ML4I/air-quality-forecast/mlruns/831635215727137506/44390138286443c89d4aec190792d243/artifacts
+end_time: 1727641988050
+entry_point_name: ''
+experiment_id: '831635215727137506'
+lifecycle_stage: active
+run_id: 44390138286443c89d4aec190792d243
+run_name: awesome-bee-67
+run_uuid: 44390138286443c89d4aec190792d243
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727641973732
+status: 3
+tags: []
+user_id: User

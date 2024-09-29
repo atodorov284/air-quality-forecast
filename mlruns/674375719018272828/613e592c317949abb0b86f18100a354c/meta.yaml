@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/674375719018272828/613e592c317949abb0b86f18100a354c/artifacts
+end_time: 1727642443930
+entry_point_name: ''
+experiment_id: '674375719018272828'
+lifecycle_stage: active
+run_id: 613e592c317949abb0b86f18100a354c
+run_name: stately-hound-180
+run_uuid: 613e592c317949abb0b86f18100a354c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727642381677
+status: 3
+tags: []
+user_id: User

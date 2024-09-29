@@ -1,0 +1,8 @@
+decision_tree:
+    max_depth: [20, 50]
+
+random_forest:
+    max_depth: [20, 50]
+
+xgboost:
+    max_depth: [20, 50]
