@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/588532547813609546/dae66a3f206c432b826b3e870f05a0ab/artifacts
+end_time: 1727618196870
+entry_point_name: ''
+experiment_id: '588532547813609546'
+lifecycle_stage: active
+run_id: dae66a3f206c432b826b3e870f05a0ab
+run_name: invincible-sheep-498
+run_uuid: dae66a3f206c432b826b3e870f05a0ab
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727618161919
+status: 4
+tags: []
+user_id: User

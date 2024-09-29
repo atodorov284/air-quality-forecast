@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/e33fa9db629044478ec7da5da15991bb/artifacts
+end_time: 1727614684497
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: e33fa9db629044478ec7da5da15991bb
+run_name: capable-doe-137
+run_uuid: e33fa9db629044478ec7da5da15991bb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727614667454
+status: 3
+tags: []
+user_id: User

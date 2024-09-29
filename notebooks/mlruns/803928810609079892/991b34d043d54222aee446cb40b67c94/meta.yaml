@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/991b34d043d54222aee446cb40b67c94/artifacts
+end_time: 1727625502276
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 991b34d043d54222aee446cb40b67c94
+run_name: smiling-bear-782
+run_uuid: 991b34d043d54222aee446cb40b67c94
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727625488943
+status: 3
+tags: []
+user_id: User

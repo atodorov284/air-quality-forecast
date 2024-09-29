@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/684500c130404ff99d92169e50e7f75c/artifacts
+end_time: 1727615314763
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 684500c130404ff99d92169e50e7f75c
+run_name: dashing-ray-437
+run_uuid: 684500c130404ff99d92169e50e7f75c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727615307402
+status: 4
+tags: []
+user_id: User

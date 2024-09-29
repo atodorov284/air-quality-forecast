@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/78259ca813cf49b69fa3b94f35bd8e73/artifacts
+end_time: 1727616403119
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 78259ca813cf49b69fa3b94f35bd8e73
+run_name: hilarious-cub-155
+run_uuid: 78259ca813cf49b69fa3b94f35bd8e73
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727615400200
+status: 3
+tags: []
+user_id: User

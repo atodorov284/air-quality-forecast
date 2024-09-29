@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/e684490d78f54fcf8b51f3a2b8018698/artifacts
+end_time: 1727623653868
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: e684490d78f54fcf8b51f3a2b8018698
+run_name: magnificent-moth-700
+run_uuid: e684490d78f54fcf8b51f3a2b8018698
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727623644425
+status: 3
+tags: []
+user_id: User
