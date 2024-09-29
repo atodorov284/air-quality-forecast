@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/674375719018272828/2ad059c5d4704ed088a288d572818bcf/artifacts
+end_time: 1727642091474
+entry_point_name: ''
+experiment_id: '674375719018272828'
+lifecycle_stage: active
+run_id: 2ad059c5d4704ed088a288d572818bcf
+run_name: stately-worm-527
+run_uuid: 2ad059c5d4704ed088a288d572818bcf
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727642048270
+status: 3
+tags: []
+user_id: User

@@ -1,7 +1,0 @@
-artifact_location: mlflow-artifacts:/505669905456653781
-creation_time: 1727625742848
-experiment_id: '505669905456653781'
-last_update_time: 1727626021478
-lifecycle_stage: deleted
-name: LightGBM-BayesianOptimization
-tags: {}
