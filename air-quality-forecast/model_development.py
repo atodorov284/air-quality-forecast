@@ -175,9 +175,9 @@ def set_path() -> None:
     Returns:
         None
     """
-    currentdir = os.path.dirname(os.path.realpath(__file__))
-    parentdir = os.path.dirname(currentdir)
-    sys.path.insert(0, parentdir)
+    
+    #parentdir = os.path.dirname(currentdir)
+    #sys.path.insert(0, parentdir)
 
 
 def run_bayesian_optimization(
@@ -214,20 +214,24 @@ def run_bayesian_optimization(
 
 
 def train_all_models():
-    set_path()
-
     np.random.seed(RANDOM_SEED)
 
+    project_root = os.path.dirname(os.path.dirname(__file__))
+    processed_data_path = os.path.join(project_root, "data", "processed")
+    
+
     x_train, y_train = (
-        pd.read_csv("data/processed/x_train.csv", index_col=0),
-        pd.read_csv("data/processed/y_train.csv", index_col=0),
+        pd.read_csv(os.path.join(processed_data_path, "x_train.csv"), index_col=0),
+        pd.read_csv(os.path.join(processed_data_path, "y_train.csv"), index_col=0)
     )
     x_test, y_test = (
-        pd.read_csv("data/processed/x_test.csv", index_col=0),
-        pd.read_csv("data/processed/y_test.csv", index_col=0),
+        pd.read_csv(os.path.join(processed_data_path, "x_test.csv"), index_col=0),
+        pd.read_csv(os.path.join(processed_data_path, "y_test.csv"), index_col=0)
     )
 
-    with open("configs/hyperparameter_search_spaces.yaml", "r") as stream:
+    configs_data_path = os.path.join(project_root, "configs")
+    
+    with open(os.path.join(configs_data_path, "hyperparameter_search_spaces.yaml"), "r") as stream:
         param_space_config = yaml.safe_load(stream)
 
     run_bayesian_optimization(
