@@ -1,0 +1,6 @@
+artifact_location: mlflow-artifacts:/803928810609079892
+creation_time: 1727614574918
+experiment_id: '803928810609079892'
+last_update_time: 1727614574918
+lifecycle_stage: active
+name: DecisionTree-BayesianOptimization

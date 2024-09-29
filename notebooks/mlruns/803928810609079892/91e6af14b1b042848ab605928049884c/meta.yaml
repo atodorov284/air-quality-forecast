@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/91e6af14b1b042848ab605928049884c/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 91e6af14b1b042848ab605928049884c
+run_name: illustrious-sow-625
+run_uuid: 91e6af14b1b042848ab605928049884c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727623875230
+status: 1
+tags: []
+user_id: User

@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/45e58b92c6b041218f8100512a9d5bac/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 45e58b92c6b041218f8100512a9d5bac
+run_name: dapper-doe-841
+run_uuid: 45e58b92c6b041218f8100512a9d5bac
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727624790993
+status: 1
+tags: []
+user_id: User

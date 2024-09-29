@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/2241cc2c93034b4bb5f3b4339c46523a/artifacts
+end_time: 1727614741650
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 2241cc2c93034b4bb5f3b4339c46523a
+run_name: rare-snail-956
+run_uuid: 2241cc2c93034b4bb5f3b4339c46523a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727614725220
+status: 3
+tags: []
+user_id: User

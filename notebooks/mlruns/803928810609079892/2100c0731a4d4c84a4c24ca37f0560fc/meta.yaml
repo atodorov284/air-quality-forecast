@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/2100c0731a4d4c84a4c24ca37f0560fc/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 2100c0731a4d4c84a4c24ca37f0560fc
+run_name: enthused-mole-642
+run_uuid: 2100c0731a4d4c84a4c24ca37f0560fc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727624343115
+status: 1
+tags: []
+user_id: User

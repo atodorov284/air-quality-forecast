@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/dd705624ffe04b528c2731e6cd73d39b/artifacts
+end_time: 1727614969329
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: dd705624ffe04b528c2731e6cd73d39b
+run_name: mysterious-smelt-789
+run_uuid: dd705624ffe04b528c2731e6cd73d39b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727614969246
+status: 4
+tags: []
+user_id: User

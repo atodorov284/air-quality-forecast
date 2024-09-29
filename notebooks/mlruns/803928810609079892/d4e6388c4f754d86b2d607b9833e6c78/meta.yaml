@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/d4e6388c4f754d86b2d607b9833e6c78/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: d4e6388c4f754d86b2d607b9833e6c78
+run_name: clean-squid-405
+run_uuid: d4e6388c4f754d86b2d607b9833e6c78
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727625105833
+status: 1
+tags: []
+user_id: User

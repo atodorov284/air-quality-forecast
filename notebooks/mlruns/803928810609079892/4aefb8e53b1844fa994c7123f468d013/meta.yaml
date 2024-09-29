@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/4aefb8e53b1844fa994c7123f468d013/artifacts
+end_time: 1727615340249
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 4aefb8e53b1844fa994c7123f468d013
+run_name: persistent-fish-936
+run_uuid: 4aefb8e53b1844fa994c7123f468d013
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727615322751
+status: 4
+tags: []
+user_id: User
