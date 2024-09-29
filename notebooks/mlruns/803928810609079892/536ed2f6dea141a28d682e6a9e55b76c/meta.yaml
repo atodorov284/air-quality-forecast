@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/536ed2f6dea141a28d682e6a9e55b76c/artifacts
+end_time: 1727624456224
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 536ed2f6dea141a28d682e6a9e55b76c
+run_name: capable-shrew-47
+run_uuid: 536ed2f6dea141a28d682e6a9e55b76c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727624422592
+status: 3
+tags: []
+user_id: User

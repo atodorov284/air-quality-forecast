@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/3ae80f8285c54b3cb56b16b34be46504/artifacts
+end_time: 1727617220206
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 3ae80f8285c54b3cb56b16b34be46504
+run_name: upbeat-lynx-812
+run_uuid: 3ae80f8285c54b3cb56b16b34be46504
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727616882432
+status: 4
+tags: []
+user_id: User

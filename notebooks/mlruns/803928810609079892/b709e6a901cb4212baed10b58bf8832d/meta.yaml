@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/b709e6a901cb4212baed10b58bf8832d/artifacts
+end_time: 1727624342865
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: b709e6a901cb4212baed10b58bf8832d
+run_name: carefree-rat-655
+run_uuid: b709e6a901cb4212baed10b58bf8832d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727624304753
+status: 3
+tags: []
+user_id: User

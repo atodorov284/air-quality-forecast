@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/7705b9d9fd3d49989178abe377d65cb4/artifacts
+end_time: 1727614619510
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 7705b9d9fd3d49989178abe377d65cb4
+run_name: upset-bee-318
+run_uuid: 7705b9d9fd3d49989178abe377d65cb4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727614618573
+status: 4
+tags: []
+user_id: User

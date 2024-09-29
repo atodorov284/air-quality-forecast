@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/803928810609079892/7f6a938ab13c4ee39a0fabc20170501f/artifacts
+end_time: 1727615300661
+entry_point_name: ''
+experiment_id: '803928810609079892'
+lifecycle_stage: active
+run_id: 7f6a938ab13c4ee39a0fabc20170501f
+run_name: beautiful-snake-63
+run_uuid: 7f6a938ab13c4ee39a0fabc20170501f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727615294406
+status: 4
+tags: []
+user_id: User
