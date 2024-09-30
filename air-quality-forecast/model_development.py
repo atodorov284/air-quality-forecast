@@ -15,7 +15,6 @@ from xgboost import XGBRegressor
 from sklearn.ensemble import RandomForestRegressor
 import yaml
 import os
-import sys
 
 warnings.filterwarnings("ignore")
 
@@ -52,13 +51,29 @@ class RegressorTrainer:
         self._x_test: np.ndarray | None = None
         self._y_test: np.ndarray | None = None
         self._n_iter = n_iter
+        self._current_run = None
 
     def _port_in_use(self, port: int) -> bool:
+        """
+        Check if a port is in use.
+
+        Parameters:
+            port (int): Port to check.
+
+        Returns:
+            bool: True if the port is in use, False otherwise.
+        """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             # This actually returns an int and not a bool
             return s.connect_ex(("localhost", port)) == 0
 
     def _launch_mlflow_server(self) -> None:
+        """
+        Launch MLflow server at http://127.0.0.1:5000, if not already running.
+
+        If the port is already in use, it will print a message saying so.
+        If there is an error launching the server, it will print the error.
+        """
         port = 5000
         if not self._port_in_use(port):
             try:
@@ -68,8 +83,19 @@ class RegressorTrainer:
                     stderr=subprocess.PIPE,
                 )
                 print(f"MLflow server launched at http://127.0.0.1:{port}")
-            except Exception as e:
-                print("Error launching MLflow server:", e)
+            except Exception:
+                try:
+                    subprocess.Popen(
+                        ["python", "-m", "mlflow", "ui", "--port", str(port)],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    )
+                    print(f"MLflow server launched at http://127.0.0.1:{port}")
+                except Exception as e:
+                    print("Error launching MLflow server:", e)
+                    print(
+                        "Both py -m mlflow ui and python -m mlflow ui failed. Please run the server yourself."
+                    )
         else:
             print(f"MLflow server is running at http://127.0.0.1:{port}")
 
@@ -95,7 +121,14 @@ class RegressorTrainer:
         self._y_test = np.array(y_test)
 
     def _setup_mlflow(self) -> None:
-        """Set up MLflow configuration."""
+        """
+        Set up MLflow configuration.
+
+        This method launches the MLflow server, sets the MLflow experiment name and
+        tracking URI, enables system metrics logging, and turns on autologging of
+        metrics and parameters.
+
+        """
         self._launch_mlflow_server()
         mlflow.set_experiment(self._experiment_name)
         mlflow.set_tracking_uri("http://localhost:5000/")
@@ -103,7 +136,18 @@ class RegressorTrainer:
         mlflow.autolog()
 
     def _perform_search(self) -> None:
-        """Perform Bayesian optimization for hyperparameters."""
+        """
+        Perform Bayesian optimization for hyperparameters.
+
+        This method initializes and performs a BayesSearchCV search for the best
+        hyperparameters of the regressor. The search is performed on the training
+        data using a TimeSeriesSplit cross-validation scheme. The best
+        hyperparameters and the corresponding mean squared error are logged to
+        MLflow.
+
+        Raises:
+            ValueError: If training data has not been set. Call `_set_data` first.
+        """
         if self._x_train is None or self._y_train is None:
             raise ValueError("Training data has not been set. Call `_set_data` first.")
 
@@ -121,11 +165,20 @@ class RegressorTrainer:
             verbose=1,  # To display progress
             random_state=RANDOM_SEED,  # Ensures reproducibility
         )
-
         self._bayes_search.fit(self._x_train, self._y_train)
 
+        mlflow.log_params(self._bayes_search.best_params_)
+
+        mlflow.log_metric("Correct Train MSE", -self._bayes_search.best_score_)
+
     def _evaluate_model(self) -> None:
-        """Evaluate the best model on the test data and log metrics."""
+        """
+        Evaluate the best model on the test data and log metrics.
+
+        Raises:
+            ValueError: If test data has not been set. Call `_set_data` first.
+            ValueError: If Bayesian search has not been performed. Call `_perform_search` first.
+        """
         if self._x_test is None or self._y_test is None:
             raise ValueError("Test data has not been set. Call `_set_data` first.")
         if self._bayes_search is None:
@@ -143,12 +196,20 @@ class RegressorTrainer:
             self._y_test, best_regressor.predict(self._x_test)
         )
 
-        print(
-            "Best hyperparameters found by Bayesian optimization:",
-            self._bayes_search.best_params_,
-        )
-        print("Test MSE: ", test_mse)
-        print("Test RMSE: ", test_rmse)
+        mlflow.log_metric("Correct Test MSE", test_mse)
+        mlflow.log_metric("Correct Test RMSE", test_rmse)
+
+    def _optimize_and_evaluate(self):
+        """
+        Perform Bayesian optimization for hyperparameters and evaluate the best model on the test data.
+
+        This method wraps `_perform_search` and `_evaluate_model` in a single MLflow run.
+
+        """
+        with mlflow.start_run():
+            self._perform_search()
+            self._evaluate_model()
+            mlflow.end_run()
 
     def run(
         self,
@@ -157,27 +218,18 @@ class RegressorTrainer:
         x_test: np.ndarray,
         y_test: np.ndarray,
     ) -> None:
+        """
+        Run the Bayesian optimization workflow.
+
+        Parameters:
+            x_train (np.ndarray): Training data features.
+            y_train (np.ndarray): Training data labels.
+            x_test (np.ndarray): Test data features.
+            y_test (np.ndarray): Test data labels.
+        """
         self._set_data(x_train, y_train, x_test, y_test)
         self._setup_mlflow()
-        self._perform_search()
-        self._evaluate_model()
-
-
-def set_path() -> None:
-    """
-    Set the path to include the parent directory of the current file.
-
-    This is needed to import modules from the parent directory.
-
-    Parameters:
-        None
-
-    Returns:
-        None
-    """
-    
-    #parentdir = os.path.dirname(currentdir)
-    #sys.path.insert(0, parentdir)
+        self._optimize_and_evaluate()
 
 
 def run_bayesian_optimization(
@@ -214,24 +266,38 @@ def run_bayesian_optimization(
 
 
 def train_all_models():
+    """
+    Train all models using Bayesian optimization.
+
+    This function is used to train the three models (DecisionTreeRegressor, XGBRegressor, and RandomForestRegressor)
+    using Bayesian optimization.
+
+    The training and test data are loaded from the "data/processed" directory.
+
+    The hyperparameter search spaces for each model are loaded from "configs/hyperparameter_search_spaces.yaml".
+
+    The trained models are logged to the MLflow server.
+
+    """
     np.random.seed(RANDOM_SEED)
 
     project_root = os.path.dirname(os.path.dirname(__file__))
     processed_data_path = os.path.join(project_root, "data", "processed")
-    
 
     x_train, y_train = (
         pd.read_csv(os.path.join(processed_data_path, "x_train.csv"), index_col=0),
-        pd.read_csv(os.path.join(processed_data_path, "y_train.csv"), index_col=0)
+        pd.read_csv(os.path.join(processed_data_path, "y_train.csv"), index_col=0),
     )
     x_test, y_test = (
         pd.read_csv(os.path.join(processed_data_path, "x_test.csv"), index_col=0),
-        pd.read_csv(os.path.join(processed_data_path, "y_test.csv"), index_col=0)
+        pd.read_csv(os.path.join(processed_data_path, "y_test.csv"), index_col=0),
     )
 
     configs_data_path = os.path.join(project_root, "configs")
-    
-    with open(os.path.join(configs_data_path, "hyperparameter_search_spaces.yaml"), "r") as stream:
+
+    with open(
+        os.path.join(configs_data_path, "hyperparameter_search_spaces.yaml"), "r"
+    ) as stream:
         param_space_config = yaml.safe_load(stream)
 
     run_bayesian_optimization(

@@ -19,7 +19,7 @@
 				"docker-build"
 			],
 			"python": {
-				"file": "air-quality-forecast\\main.py"
+				"file": "air-quality-forecast\\model_development.py"
 			}
 		}
 	]

@@ -1,0 +1,15 @@
+artifact_uri: file:///c:/Users/User/ML4I/air-quality-forecast/notebooks/mlruns/198715715112686074/78e67b5383da438dbe0df2e1e6c32e7c/artifacts
+end_time: 1727699580018
+entry_point_name: ''
+experiment_id: '198715715112686074'
+lifecycle_stage: active
+run_id: 78e67b5383da438dbe0df2e1e6c32e7c
+run_name: glamorous-sponge-699
+run_uuid: 78e67b5383da438dbe0df2e1e6c32e7c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727699535835
+status: 3
+tags: []
+user_id: User
