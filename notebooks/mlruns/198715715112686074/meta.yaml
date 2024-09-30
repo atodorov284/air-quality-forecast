@@ -1,0 +1,6 @@
+artifact_location: file:///c:/Users/User/ML4I/air-quality-forecast/notebooks/mlruns/198715715112686074
+creation_time: 1727699207596
+experiment_id: '198715715112686074'
+last_update_time: 1727699207596
+lifecycle_stage: active
+name: DecisionTree-BayesianOptimization

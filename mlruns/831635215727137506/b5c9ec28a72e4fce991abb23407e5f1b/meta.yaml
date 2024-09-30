@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/User/ML4I/air-quality-forecast/mlruns/831635215727137506/b5c9ec28a72e4fce991abb23407e5f1b/artifacts
+end_time: 1727651579550
+entry_point_name: ''
+experiment_id: '831635215727137506'
+lifecycle_stage: active
+run_id: b5c9ec28a72e4fce991abb23407e5f1b
+run_name: nimble-robin-910
+run_uuid: b5c9ec28a72e4fce991abb23407e5f1b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727651496991
+status: 3
+tags: []
+user_id: User
