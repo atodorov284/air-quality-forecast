@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/674375719018272828/76dbfe027b2f4eb8837a0d1ab60ded47/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '674375719018272828'
+lifecycle_stage: active
+run_id: 76dbfe027b2f4eb8837a0d1ab60ded47
+run_name: Bayesian_Optimization_and_Eval
+run_uuid: 76dbfe027b2f4eb8837a0d1ab60ded47
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727712447416
+status: 1
+tags: []
+user_id: User
