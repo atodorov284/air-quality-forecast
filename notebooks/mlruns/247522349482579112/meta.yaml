@@ -1,0 +1,6 @@
+artifact_location: file:///scratch/s5100534/mlruns/247522349482579112
+creation_time: 1727955942477
+experiment_id: '247522349482579112'
+last_update_time: 1727955942477
+lifecycle_stage: active
+name: DecisionTree-BayesianOptimization

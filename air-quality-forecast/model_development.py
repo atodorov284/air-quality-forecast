@@ -6,6 +6,7 @@ from sklearn.base import BaseEstimator
 from sklearn.metrics import mean_squared_error, root_mean_squared_error
 from sklearn.model_selection import TimeSeriesSplit
 from skopt import BayesSearchCV
+from skopt.space import Real, Integer, Categorical
 from typing import Dict, Any
 import socket
 import pandas as pd
@@ -133,7 +134,7 @@ class RegressorTrainer:
         mlflow.set_experiment(self._experiment_name)
         mlflow.set_tracking_uri("http://localhost:5000/")
         mlflow.enable_system_metrics_logging()
-        mlflow.autolog()
+        mlflow.autolog(silent=True)
 
     def _perform_search(self) -> None:
         """
@@ -169,8 +170,14 @@ class RegressorTrainer:
 
         mlflow.log_params(self._bayes_search.best_params_)
 
-        mlflow.log_metric("Correct Train MSE", -self._bayes_search.best_score_)
-
+        
+        best_regressor = self._bayes_search.best_estimator_
+        train_mse = mean_squared_error(
+            self._y_train, best_regressor.predict(self._x_train)
+        )
+        
+        mlflow.log_metric("Correct Train MSE", train_mse)
+        
     def _evaluate_model(self) -> None:
         """
         Evaluate the best model on the test data and log metrics.
@@ -231,6 +238,37 @@ class RegressorTrainer:
         self._setup_mlflow()
         self._optimize_and_evaluate()
 
+def convert_param_space(param_space: dict):
+    """
+    Convert a parameter space dictionary to a format usable by skopt.
+
+    This function takes a dictionary where the keys are parameter names and the
+    values are lists of two values that represent the range of possible values
+    for that parameter. The function then converts these ranges to skopt
+    parameter objects and returns a new dictionary where the parameter names
+    are the same but the values are now skopt parameter objects.
+
+    Parameters:
+        param_space (dict): A dictionary with parameter names as keys and ranges
+            of possible values as values.
+
+    Returns:
+        dict: A dictionary with parameter names as keys and skopt parameter
+            objects as values.
+    """
+    converted_space = {}
+    for param, values in param_space.items():
+        if isinstance(values[0], bool):
+            converted_space[param] = Categorical(values)
+        elif all(isinstance(v, int) for v in values):
+            converted_space[param] = Integer(values[0], values[1])
+        elif all(isinstance(v, float) for v in values):
+            converted_space[param] = Real(values[0], values[1])
+        elif all(isinstance(v, str) for v in values):
+            converted_space[param] = Categorical(values)
+        else:
+            raise ValueError(f"Unknown parameter type for {param}")
+    return converted_space
 
 def run_bayesian_optimization(
     x_train: np.ndarray,
@@ -299,6 +337,11 @@ def train_all_models():
         os.path.join(configs_data_path, "hyperparameter_search_spaces.yaml"), "r"
     ) as stream:
         param_space_config = yaml.safe_load(stream)
+        
+    param_space_config["decision_tree"] = convert_param_space(param_space_config["decision_tree"])
+    print(param_space_config["decision_tree"])
+    param_space_config["xgboost"] = convert_param_space(param_space_config["xgboost"])
+    param_space_config["random_forest"] = convert_param_space(param_space_config["random_forest"])
 
     run_bayesian_optimization(
         x_train,
