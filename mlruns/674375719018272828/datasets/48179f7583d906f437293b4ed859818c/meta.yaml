@@ -1,9 +1,0 @@
-digest: 7c1fa8b3
-name: dataset
-profile: '{"features_shape": [2452, 33], "features_size": 80916, "features_nbytes":
-  323664}'
-schema: '{"mlflow_tensorspec": {"features": "[{\"type\": \"tensor\", \"tensor-spec\":
-  {\"dtype\": \"float32\", \"shape\": [-1, 33]}}]", "targets": null}}'
-source: '{"tags": {"mlflow.user": "User", "mlflow.source.name": "c:/Users/User/ML4I/air-quality-forecast/air-quality-forecast/model_development.py",
-  "mlflow.source.type": "LOCAL", "mlflow.source.git.commit": "da08d56ac3b3131519322c57e8db01547d638865"}}'
-source_type: code

@@ -1,6 +1,6 @@
-artifact_location: file:///c:/Users/User/ML4I/air-quality-forecast/notebooks/mlruns/0
-creation_time: 1727699207526
+artifact_location: file:///scratch/s5100534/mlruns/0
+creation_time: 1727955942444
 experiment_id: '0'
-last_update_time: 1727699207526
+last_update_time: 1727955942444
 lifecycle_stage: active
 name: Default
