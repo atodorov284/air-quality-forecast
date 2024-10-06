@@ -1,3 +1,4 @@
 notebooks/* linguist-vendored
+*.ipynb linguist-vendored
 *.pkl filter=lfs diff=lfs merge=lfs -text
 *.xgb filter=lfs diff=lfs merge=lfs -text
