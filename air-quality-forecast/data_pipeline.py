@@ -224,10 +224,7 @@ class PreprocessingPipeline:
         self.normalizer = MinMaxScaler()
 
     def train_test_split(
-        self,
-        x: pd.DataFrame,
-        y: pd.DataFrame,
-        test_size: float = 0.2
+        self, x: pd.DataFrame, y: pd.DataFrame, test_size: float = 0.2
     ) -> Tuple[
         pd.DataFrame,
         pd.DataFrame,
@@ -245,9 +242,9 @@ class PreprocessingPipeline:
         InputValidator.validate_type(x, pd.DataFrame, "data")
         InputValidator.validate_type(y, pd.DataFrame, "data")
         InputValidator.validate_type(test_size, float, "test_size")
-    
+
         x_train, x_test, y_train, y_test = train_test_split(
-            x, y, test_size= test_size , shuffle=False
+            x, y, test_size=test_size, shuffle=False
         )
 
         return x_train, x_test, y_train, y_test
@@ -283,16 +280,14 @@ class PreprocessingPipeline:
         ]
         x = preprocessed_data.drop(columns_to_predict, axis=1)
         y = preprocessed_data[columns_to_predict]
-        x_train, x_test, y_train, y_test = (
-            self.train_test_split(x, y)
-        )
+        x_train, x_test, y_train, y_test = self.train_test_split(x, y)
 
         # Step 5: Normalize data for 2 sets (x_train, x_test)
         x_train[x_train.columns] = self.normalizer.fit_transform(
             x_train[x_train.columns]
         )
         x_test[x_test.columns] = self.normalizer.transform(x_test[x_test.columns])
-    
+
         # Convert the normalized NumPy array back to a DataFrame
         # normalized_x_train = pd.DataFrame(x_train, columns=preprocessed_data.columns, index=preprocessed_data.index)
 
@@ -306,6 +301,7 @@ class PreprocessingPipeline:
         # normalized_df = pd.DataFrame(normalized_data, columns=preprocessed_data.columns, index=preprocessed_data.index)
 
         return preprocessed_data
+
 
 if __name__ == "__main__":
     pipeline = PreprocessingPipeline()
