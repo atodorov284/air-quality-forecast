@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/146369756112246655/75504635158f410eb328c9b66cafcbd2/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '146369756112246655'
+lifecycle_stage: active
+run_id: 75504635158f410eb328c9b66cafcbd2
+run_name: auspicious-rat-46
+run_uuid: 75504635158f410eb328c9b66cafcbd2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727971937322
+status: 1
+tags: []
+user_id: s5100534

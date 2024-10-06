@@ -227,7 +227,7 @@ class PreprocessingPipeline:
         self,
         x: pd.DataFrame,
         y: pd.DataFrame,
-        test_size_: float = 0.3
+        test_size: float = 0.2
     ) -> Tuple[
         pd.DataFrame,
         pd.DataFrame,
@@ -244,10 +244,10 @@ class PreprocessingPipeline:
         """
         InputValidator.validate_type(x, pd.DataFrame, "data")
         InputValidator.validate_type(y, pd.DataFrame, "data")
-        InputValidator.validate_type(test_size_, float, "test_size")
+        InputValidator.validate_type(test_size, float, "test_size")
     
         x_train, x_test, y_train, y_test = train_test_split(
-            x, y, test_size= test_size_ , shuffle=False
+            x, y, test_size= test_size , shuffle=False
         )
 
         return x_train, x_test, y_train, y_test

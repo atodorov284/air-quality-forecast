@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/366942821633260301/58eb8390ad164113b3c869bc59d343b2/artifacts
+end_time: 1727960947485
+entry_point_name: ''
+experiment_id: '366942821633260301'
+lifecycle_stage: active
+run_id: 58eb8390ad164113b3c869bc59d343b2
+run_name: bustling-trout-642
+run_uuid: 58eb8390ad164113b3c869bc59d343b2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727958899850
+status: 3
+tags: []
+user_id: s5100534
