@@ -54,7 +54,8 @@ class RegressorTrainer:
         self._n_iter = n_iter
         self._current_run = None
 
-    def _port_in_use(self, port: int) -> bool:
+    @staticmethod
+    def port_in_use(port: int) -> bool:
         """
         Check if a port is in use.
 
@@ -68,7 +69,8 @@ class RegressorTrainer:
             # This actually returns an int and not a bool
             return s.connect_ex(("localhost", port)) == 0
 
-    def _launch_mlflow_server(self) -> None:
+    @staticmethod
+    def launch_mlflow_server() -> None:
         """
         Launch MLflow server at http://127.0.0.1:5000, if not already running.
 
@@ -76,7 +78,7 @@ class RegressorTrainer:
         If there is an error launching the server, it will print the error.
         """
         port = 5000
-        if not self._port_in_use(port):
+        if not RegressorTrainer.port_in_use(port):
             try:
                 subprocess.Popen(
                     ["py", "-m", "mlflow", "ui", "--port", str(port)],
@@ -130,7 +132,7 @@ class RegressorTrainer:
         metrics and parameters.
 
         """
-        self._launch_mlflow_server()
+        RegressorTrainer.launch_mlflow_server()
         mlflow.set_experiment(self._experiment_name)
         mlflow.set_tracking_uri("http://localhost:5000/")
         mlflow.enable_system_metrics_logging()
@@ -376,4 +378,5 @@ def train_all_models():
 
 
 if __name__ == "__main__":
-    train_all_models()
+    #train_all_models()
+    RegressorTrainer.launch_mlflow_server()
