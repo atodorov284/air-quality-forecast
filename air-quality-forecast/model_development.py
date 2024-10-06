@@ -172,14 +172,13 @@ class RegressorTrainer:
 
         mlflow.log_params(self._bayes_search.best_params_)
 
-        
         best_regressor = self._bayes_search.best_estimator_
         train_mse = mean_squared_error(
             self._y_train, best_regressor.predict(self._x_train)
         )
-        
+
         mlflow.log_metric("Correct Train MSE", train_mse)
-        
+
     def _evaluate_model(self) -> None:
         """
         Evaluate the best model on the test data and log metrics.
@@ -240,6 +239,7 @@ class RegressorTrainer:
         self._setup_mlflow()
         self._optimize_and_evaluate()
 
+
 def convert_param_space(param_space: dict):
     """
     Convert a parameter space dictionary to a format usable by skopt.
@@ -271,6 +271,7 @@ def convert_param_space(param_space: dict):
         else:
             raise ValueError(f"Unknown parameter type for {param}")
     return converted_space
+
 
 def run_bayesian_optimization(
     x_train: np.ndarray,
@@ -339,11 +340,15 @@ def train_all_models():
         os.path.join(configs_data_path, "hyperparameter_search_spaces.yaml"), "r"
     ) as stream:
         param_space_config = yaml.safe_load(stream)
-        
-    param_space_config["decision_tree"] = convert_param_space(param_space_config["decision_tree"])
+
+    param_space_config["decision_tree"] = convert_param_space(
+        param_space_config["decision_tree"]
+    )
     print(param_space_config["decision_tree"])
     param_space_config["xgboost"] = convert_param_space(param_space_config["xgboost"])
-    param_space_config["random_forest"] = convert_param_space(param_space_config["random_forest"])
+    param_space_config["random_forest"] = convert_param_space(
+        param_space_config["random_forest"]
+    )
 
     run_bayesian_optimization(
         x_train,
@@ -378,5 +383,5 @@ def train_all_models():
 
 
 if __name__ == "__main__":
-    #train_all_models()
+    # train_all_models()
     RegressorTrainer.launch_mlflow_server()

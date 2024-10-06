@@ -9,6 +9,7 @@ on:
     branches:
       - main
       - data_engineering
+      - model_development
 
 jobs:
   check-reproducibility:
@@ -25,7 +26,4 @@ jobs:
       - name: Run main.py
         id: run_main
         run: |
-          set +e
           python3 main.py
-          exit_code=$?
-          echo "EXIT_CODE=${exit_code}" >> $GITHUB_OUTPUT

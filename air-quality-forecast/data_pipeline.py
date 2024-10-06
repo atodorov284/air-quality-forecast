@@ -306,3 +306,7 @@ class PreprocessingPipeline:
         # normalized_df = pd.DataFrame(normalized_data, columns=preprocessed_data.columns, index=preprocessed_data.index)
 
         return preprocessed_data
+
+if __name__ == "__main__":
+    pipeline = PreprocessingPipeline()
+    pipeline.run_pipeline()
