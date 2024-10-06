@@ -10,7 +10,17 @@ In the Netherlands, cities like Utrecht experience challenges concerning air qua
 
 ## How To Run This Code
 
-Currently, this repository is at the data engineering stage. To run the data pipeline, run main.py under air-quality-forecast, which contains the source code of this project. The processed and split datasets can be found under data/processed, namely x_train, x_val, x_test, y_train, y_val, y_test.
+Currently, this repository finished the model development stage. 
+
+To run the data pipeline, run `data_pipeline.py` under air-quality forecast, which is the folder that contains the source code of this project. The processed and split datasets can be found under data/processed, namely x_train, x_val, x_test, y_train, y_val, y_test.
+
+To see the MLFlow dashboard, used to track experiments, run model_development.py. It will automatically create a server at your localhost port 5000. If this does not work, please run
+`mlflow ui --port 5000`
+in your console. You might need to give admin permissions to this process. The MLFlow dashboard contains all information about the experiments ran, including hyperparameters selected for each model. The selected models can be found under the Models menu.
+
+To run the prediction, run `main.py`. It will display the MSE and RMSE of the train and test data for all three models.
+
+## DISCLAIMER
 
 The notebooks in this project were used as scratch for analysis and data merge and do not reflect our thorough methodology (source is under air-quality-forecast). Some extra scripts for the generation of our plots in the report can be found under extra_scripts.
 
@@ -49,6 +59,8 @@ The notebooks in this project were used as scratch for analysis and data merge a
 │
 ├── configs            <- Configuration folder for the hyperparameter search space (for now)
 │
+├── saved_models       <- Folder with the saved models in `.pkl` and `.xgb`.
+│
 ├── extra_scripts      <- Some extra scripts in R and .tex to generate figures
 │
 └── air-quality-forecast   <- Source code for use in this project.
@@ -57,11 +69,13 @@ The notebooks in this project were used as scratch for analysis and data merge a
     │
     ├── data_pipeline.py        <- Loads, extracts, and preprocesses the data. Final result is the train-test under data/processed
     │
-    ├── model_development.py    <- Trains the three models using k-fold CV and Bayesian hyperparameter tuning
+    ├── model_development.py    <- Trains the three models using k-fold CV and Bayesian hyperparameter tuning, displays the ML │                              dashboard if executed
+    │
+    ├── prediction.py           <- Loads the models and makes an example prediction
     │
     ├── utils.py                <- Utility functions, e.g. validation
     │
-    └── main.py                 <- To execute and start the project
+    └── main.py                 <- To execute and start the project. Currently to make predictions.
 
 --------
 
