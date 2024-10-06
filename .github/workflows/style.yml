@@ -9,6 +9,7 @@ on:
     branches:
       - main
       - data_engineering
+      - model_development
 
 jobs:
   flake8_py3:
