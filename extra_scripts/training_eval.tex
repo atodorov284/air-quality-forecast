@@ -1,0 +1,93 @@
+\documentclass[border=0.2cm]{standalone}
+
+% Bar chart drawing library 
+\usepackage{pgfplots} 
+\pgfplotsset{compat=1.18}
+
+% Define custom colors
+\definecolor{testcolor}{RGB}{250, 164, 58}  % Orange for test
+
+\begin{document}
+
+% RMSE Graph
+\begin{tikzpicture}
+\begin{axis} [
+    xbar = .05cm,
+    bar width = 12pt, % Keep the original bar width
+    xmin = 0, 
+    xmax = 35, 
+    at={(0cm,0)},
+    enlarge y limits = {abs = .8},
+    enlarge x limits = {value = .25, upper},
+    title={Mean Squared Error Statistics},
+    ytick={0,1,2},
+    yticklabels={Decision Tree, Random Forest, XGBoost},
+    xlabel={Mean Squared Error (MSE)},
+    xmajorgrids, % Add gridlines on x-axis
+    grid style={dashed, gray!30},
+    legend style={at={(1.05,0.5)},
+    anchor=west, legend columns=1}, % Adjusted for single line
+    legend cell align={left},
+]
+
+% Train MSE values (colored in cyan)
+\addplot[fill=cyan] coordinates {(35.32,0) (28.60,1) (21.78,2)}; 
+
+% Test MSE values (colored in orange)
+\addplot[fill=testcolor] coordinates {(36.69,0) (31.74,1) (28.70,2)}; 
+
+\addlegendentry{Train} % Single legend entry for Train
+\addlegendentry{Test}  % Single legend entry for Test
+
+% Add annotations for MSE (Train)
+\node at (axis cs:35.32,0) [yshift=-0.25cm, xshift=0.5cm] {35.32};
+\node at (axis cs:28.60,1) [yshift=-0.25cm, xshift=0.5cm] {28.60};
+\node at (axis cs:21.78,2) [yshift=-0.25cm, xshift=0.5cm] {21.78};
+
+% Add annotations for MSE (Test)
+\node at (axis cs:36.69,0) [yshift=0.25cm, xshift=0.5cm] {36.69};
+\node at (axis cs:31.74,1) [yshift=0.25cm, xshift=0.5cm] {31.74};
+\node at (axis cs:28.70,2) [yshift=0.25cm, xshift=0.5cm] {28.70};
+
+
+\end{axis}
+
+\begin{axis} [
+    xbar = .05cm,
+    bar width = 12pt, % Keep the original bar width
+    xmin = 0, 
+    xmax = 6, 
+    at={(9cm,0)},
+    title={Root Mean Squared Error Statistics},
+    enlarge y limits = {abs = .8},
+    enlarge x limits = {value = .25, upper},
+    yticklabels=\empty,
+    xlabel={Root Mean Squared Error (RMSE)},
+    xmajorgrids, % Add gridlines on x-axis
+    grid style={dashed, gray!30},
+    legend style={at={(1.05,0.5)},
+    anchor=west, legend columns=1}, % Adjusted for single line
+    legend cell align={left},
+]
+
+% Train RMSE values (colored in light blue)
+\addplot[fill=cyan] coordinates {(5.66,0) (5.11,1) (4.40,2)}; % Decision Tree, Random Forest, XGBoost
+
+% Test RMSE values (colored in orange)
+\addplot[fill=testcolor] coordinates {(5.76,0) (5.36,1) (5.04,2)}; % Decision Tree, Random Forest, XGBoost
+
+% Add annotations for RMSE (Train)
+\node at (axis cs:5.66,0) [yshift=-0.25cm, xshift=0.5cm] {5.66};
+\node at (axis cs:5.31,1) [yshift=-0.25cm, xshift=0.5cm] {5.11};
+\node at (axis cs:5.04,2) [yshift=-0.25cm, xshift=0.5cm] {4.40};
+
+% Add annotations for RMSE (Test)
+\node at (axis cs:5.66,0) [yshift=0.25cm, xshift=0.5cm] {5.76};
+\node at (axis cs:5.31,1) [yshift=0.25cm, xshift=0.5cm] {5.36};
+\node at (axis cs:5.04,2) [yshift=0.25cm, xshift=0.5cm] {5.04};
+
+\end{axis}
+
+\end{tikzpicture}
+
+\end{document}
