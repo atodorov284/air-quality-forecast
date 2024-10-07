@@ -51,7 +51,7 @@ if __name__ == "__main__":
     """output_features = ['NO2 - Day 1', 'O3 - Day 1', 'NO2 - Day 2', 'O3 - Day 2', 'NO2 - Day 3', 'O3 - Day 3']
 
     shap_values = explainer.shap_values(x_test)
-    n_outputs = shap_values.shape[2] 
+    n_outputs = shap_values.shape[2]
 
     for i in range(n_outputs):
         print(f"Generating summary plot for {output_features[i]}")
