@@ -1,5 +1,3 @@
-import os
-import sys
 from prediction import PredictorModels
 import pandas as pd
 import shap
@@ -54,17 +52,16 @@ if __name__ == "__main__":
 
     shap_values = explainer.shap_values(x_test)
     n_outputs = shap_values.shape[2] 
-    
-    
+
     for i in range(n_outputs):
         print(f"Generating summary plot for {output_features[i]}")
         plt.figure(figsize=(33, 16))
-        
+
         shap.summary_plot(shap_values[:, :, i], x_test, plot_type="dot", show=False)
-        
+
         plt.title(f"SHAP Summary Plot for {output_features[i]}")
-        
+
         plt.savefig(f"shap_summary_plot_{output_features[i].replace(' ', '_').replace('-', '')}.png", format='png', dpi=300, bbox_inches='tight')
-    
+
         plt.close()
 """
