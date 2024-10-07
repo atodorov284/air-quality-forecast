@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/366942821633260301/c4fa83acbb0a4e9195b0e3573c933349/artifacts
+end_time: 1727985573570
+entry_point_name: ''
+experiment_id: '366942821633260301'
+lifecycle_stage: active
+run_id: c4fa83acbb0a4e9195b0e3573c933349
+run_name: blushing-seal-815
+run_uuid: c4fa83acbb0a4e9195b0e3573c933349
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727980277173
+status: 3
+tags: []
+user_id: s5100534

@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1728214699802
+current_stage: None
+description: ''
+last_updated_timestamp: 1728214699802
+name: FinalXGBoost
+run_id: 58eb8390ad164113b3c869bc59d343b2
+run_link: ''
+source: mlflow-artifacts:/366942821633260301/58eb8390ad164113b3c869bc59d343b2/artifacts/model
+status: READY
+status_message: null
+storage_location: mlflow-artifacts:/366942821633260301/58eb8390ad164113b3c869bc59d343b2/artifacts/model
+user_id: null
+version: 1

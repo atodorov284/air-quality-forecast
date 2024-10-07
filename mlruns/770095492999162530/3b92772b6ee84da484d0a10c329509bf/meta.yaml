@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/770095492999162530/3b92772b6ee84da484d0a10c329509bf/artifacts
+end_time: 1727971702262
+entry_point_name: ''
+experiment_id: '770095492999162530'
+lifecycle_stage: active
+run_id: 3b92772b6ee84da484d0a10c329509bf
+run_name: bald-ape-737
+run_uuid: 3b92772b6ee84da484d0a10c329509bf
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727971697517
+status: 3
+tags: []
+user_id: s5100534

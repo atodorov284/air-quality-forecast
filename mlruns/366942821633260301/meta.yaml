@@ -1,0 +1,6 @@
+artifact_location: mlflow-artifacts:/366942821633260301
+creation_time: 1727958734264
+experiment_id: '366942821633260301'
+last_update_time: 1727958734264
+lifecycle_stage: active
+name: XGBoost-BayesianOptimization

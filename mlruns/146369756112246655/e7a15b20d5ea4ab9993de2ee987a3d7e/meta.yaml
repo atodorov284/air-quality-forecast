@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/146369756112246655/e7a15b20d5ea4ab9993de2ee987a3d7e/artifacts
+end_time: 1727971503726
+entry_point_name: ''
+experiment_id: '146369756112246655'
+lifecycle_stage: active
+run_id: e7a15b20d5ea4ab9993de2ee987a3d7e
+run_name: crawling-vole-360
+run_uuid: e7a15b20d5ea4ab9993de2ee987a3d7e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727971495574
+status: 3
+tags: []
+user_id: s5100534
