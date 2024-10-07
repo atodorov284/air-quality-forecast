@@ -1,5 +1,5 @@
 decision_tree:
-    max_depth: [2, 100] 
+    max_depth: [2, 150] 
     min_samples_split: [2, 20]
     min_samples_leaf: [25, 35]
     max_leaf_nodes: [20, 60]
