@@ -99,7 +99,7 @@ class FeatureProcessor:
         self.merged_data["datetime"] = pd.to_datetime(
             self.merged_data["datetime"], format="%d/%m/%Y"
         )
-        self.merged_data.sort_values(by="datetime", ascending=False, inplace=True)
+        self.merged_data.sort_values(by="datetime", ascending=True, inplace=True)
         return self.merged_data
 
     def select_features(self) -> pd.DataFrame:
@@ -165,7 +165,7 @@ class FeatureProcessor:
         """
         self.select_features()
         self.merged_data.set_index("date", inplace=True)
-        self.merged_data.dropna(subset=["o3", "no2"])
+        self.merged_data.dropna(subset=["o3", "no2"], inplace=True)
         self.apply_time_shift()
 
         # Drop unnecessary columns
@@ -223,13 +223,8 @@ class PreprocessingPipeline:
         self.feature_processor = None
         self.normalizer = MinMaxScaler()
 
-    def train_test_validation_split(
-        self,
-        x: pd.DataFrame,
-        y: pd.DataFrame,
-        test_size_: float = 0.15,
-        validation_size: float = 0.15,
-        random_state_=4242,
+    def train_test_split(
+        self, x: pd.DataFrame, y: pd.DataFrame, test_size: float = 0.2
     ) -> Tuple[
         pd.DataFrame,
         pd.DataFrame,
@@ -246,22 +241,13 @@ class PreprocessingPipeline:
         """
         InputValidator.validate_type(x, pd.DataFrame, "data")
         InputValidator.validate_type(y, pd.DataFrame, "data")
-        InputValidator.validate_type(test_size_, float, "test_size")
-        InputValidator.validate_type(validation_size, float, "validation_size")
-        test_val_proportion = validation_size / (
-            test_size_ + validation_size
-        )  # Proportion of test to validation_size
-        x_train, x_test_val, y_train, y_test_val = train_test_split(
-            x, y, test_size=(test_size_ + validation_size), random_state=random_state_
-        )
-        x_test, x_val, y_test, y_val = train_test_split(
-            x_test_val,
-            y_test_val,
-            test_size=test_val_proportion,
-            random_state=random_state_,
+        InputValidator.validate_type(test_size, float, "test_size")
+
+        x_train, x_test, y_train, y_test = train_test_split(
+            x, y, test_size=test_size, shuffle=False
         )
 
-        return x_train, x_test, x_val, y_train, y_test, y_val
+        return x_train, x_test, y_train, y_test
 
     def run_pipeline(self) -> pd.DataFrame:
         """
@@ -283,7 +269,7 @@ class PreprocessingPipeline:
             "v3_lagged_no_missing_predicted_data.csv", preprocessed_data
         )
 
-        # Step 4: Split data into train, test, and validation sets
+        # Step 4: Split data into train and test sets
         columns_to_predict = [
             "no2",
             "o3",
@@ -294,16 +280,13 @@ class PreprocessingPipeline:
         ]
         x = preprocessed_data.drop(columns_to_predict, axis=1)
         y = preprocessed_data[columns_to_predict]
-        x_train, x_test, x_val, y_train, y_test, y_val = (
-            self.train_test_validation_split(x, y)
-        )
+        x_train, x_test, y_train, y_test = self.train_test_split(x, y)
 
-        # Step 5: Normalize data for 3 sets (x_train, x_test, x_val)
+        # Step 5: Normalize data for 2 sets (x_train, x_test)
         x_train[x_train.columns] = self.normalizer.fit_transform(
             x_train[x_train.columns]
         )
         x_test[x_test.columns] = self.normalizer.transform(x_test[x_test.columns])
-        x_val[x_val.columns] = self.normalizer.transform(x_val[x_val.columns])
 
         # Convert the normalized NumPy array back to a DataFrame
         # normalized_x_train = pd.DataFrame(x_train, columns=preprocessed_data.columns, index=preprocessed_data.index)
@@ -311,12 +294,15 @@ class PreprocessingPipeline:
         # Step 6: Save normalized data
         self.data_loader.save_to_csv("x_train.csv", x_train)
         self.data_loader.save_to_csv("x_test.csv", x_test)
-        self.data_loader.save_to_csv("x_val.csv", x_val)
         self.data_loader.save_to_csv("y_train.csv", y_train)
         self.data_loader.save_to_csv("y_test.csv", y_test)
-        self.data_loader.save_to_csv("y_val.csv", y_val)
 
         # Convert the normalized NumPy array back to a DataFrame
         # normalized_df = pd.DataFrame(normalized_data, columns=preprocessed_data.columns, index=preprocessed_data.index)
 
         return preprocessed_data
+
+
+if __name__ == "__main__":
+    pipeline = PreprocessingPipeline()
+    pipeline.run_pipeline()

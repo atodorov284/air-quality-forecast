@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/770095492999162530/732fae4292724380b62671c206423b30/artifacts
+end_time: 1727961823236
+entry_point_name: ''
+experiment_id: '770095492999162530'
+lifecycle_stage: active
+run_id: 732fae4292724380b62671c206423b30
+run_name: sassy-wolf-698
+run_uuid: 732fae4292724380b62671c206423b30
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727961803752
+status: 3
+tags: []
+user_id: s5100534

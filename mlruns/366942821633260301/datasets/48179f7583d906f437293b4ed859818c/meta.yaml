@@ -1,0 +1,9 @@
+digest: 7c1fa8b3
+name: dataset
+profile: '{"features_shape": [2452, 33], "features_size": 80916, "features_nbytes":
+  323664}'
+schema: '{"mlflow_tensorspec": {"features": "[{\"type\": \"tensor\", \"tensor-spec\":
+  {\"dtype\": \"float32\", \"shape\": [-1, 33]}}]", "targets": null}}'
+source: '{"tags": {"mlflow.user": "s5100534", "mlflow.source.name": "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/IPython/8.5.0-GCCcore-11.3.0/lib/python3.10/site-packages/ipykernel_launcher.py",
+  "mlflow.source.type": "LOCAL"}}'
+source_type: code
