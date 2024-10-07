@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/366942821633260301/6370e43914f74bd5957c6070d1f219d3/artifacts
+end_time: 1727971695842
+entry_point_name: ''
+experiment_id: '366942821633260301'
+lifecycle_stage: active
+run_id: 6370e43914f74bd5957c6070d1f219d3
+run_name: dapper-hound-257
+run_uuid: 6370e43914f74bd5957c6070d1f219d3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727971504195
+status: 3
+tags: []
+user_id: s5100534

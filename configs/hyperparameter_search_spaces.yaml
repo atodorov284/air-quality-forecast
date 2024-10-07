@@ -1,0 +1,27 @@
+decision_tree:
+    max_depth: [2, 150] 
+    min_samples_split: [2, 20]
+    min_samples_leaf: [25, 35]
+    max_leaf_nodes: [20, 60]
+    ccp_alpha: [0.0, 0.1]
+    min_weight_fraction_leaf: [0.0, 0.5]
+    min_impurity_decrease: [0.0, 1.0]
+
+random_forest:
+    max_depth: [1, 50] 
+    ccp_alpha: [0.0, 0.1]
+    n_estimators: [5, 500] 
+    max_leaf_nodes: [2, 50] 
+    min_samples_split: [2, 25] 
+    min_samples_leaf: [2, 20]                 
+    max_features: [0.1, 1.0]
+
+xgboost:
+    eta: [0.001, 0.1]
+    n_estimators: [100, 1000]
+    max_depth: [1, 20]
+    subsample: [0.5, 1.0] 
+    colsample_bytree: [0.5, 1.0]
+    reg_lambda: [0.0, 2.0]
+    min_child_weight: [1, 15] 
+    reg_alpha: [0.0, 2.0]

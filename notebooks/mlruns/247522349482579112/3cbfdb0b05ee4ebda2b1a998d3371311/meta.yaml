@@ -1,0 +1,15 @@
+artifact_uri: file:///scratch/s5100534/mlruns/247522349482579112/3cbfdb0b05ee4ebda2b1a998d3371311/artifacts
+end_time: 1727956707688
+entry_point_name: ''
+experiment_id: '247522349482579112'
+lifecycle_stage: active
+run_id: 3cbfdb0b05ee4ebda2b1a998d3371311
+run_name: wise-wolf-896
+run_uuid: 3cbfdb0b05ee4ebda2b1a998d3371311
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727955945863
+status: 3
+tags: []
+user_id: s5100534

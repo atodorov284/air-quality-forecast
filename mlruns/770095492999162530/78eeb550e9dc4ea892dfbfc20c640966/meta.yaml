@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/770095492999162530/78eeb550e9dc4ea892dfbfc20c640966/artifacts
+end_time: 1727961248982
+entry_point_name: ''
+experiment_id: '770095492999162530'
+lifecycle_stage: active
+run_id: 78eeb550e9dc4ea892dfbfc20c640966
+run_name: fun-bat-853
+run_uuid: 78eeb550e9dc4ea892dfbfc20c640966
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727961070176
+status: 4
+tags: []
+user_id: s5100534
