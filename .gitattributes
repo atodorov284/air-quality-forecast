@@ -20,6 +20,7 @@ mlartifacts/**/artifacts/model/*.pkl filter=lfs diff=lfs merge=lfs -text
 mlartifacts/**/artifacts/model/*.xgb filter=lfs diff=lfs merge=lfs -text
 notebooks/mlartifacts/**/artifacts/model/*.pkl filter=lfs diff=lfs merge=lfs -text
 notebooks/mlartifacts/**/artifacts/model/*.xgb filter=lfs diff=lfs merge=lfs -text
+notebooks/mlartifacts/475209732522917118/6bfd7858dbb5497d8b360a75c6933267/artifacts/best_model/model.pkl filter=lfs diff=lfs merge=lfs -text
 mlartifacts/149819317988706962/**/artifacts/model/*.pkl filter=lfs diff=lfs merge=lfs -text
 mlartifacts/149819317988706962/**/artifacts/model/*.xgb filter=lfs diff=lfs merge=lfs -text
 notebooks/mlartifacts/475209732522917118/**/artifacts/model/*.pkl filter=lfs diff=lfs merge=lfs -text
