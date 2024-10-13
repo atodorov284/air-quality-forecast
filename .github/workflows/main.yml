@@ -1,22 +1,26 @@
 name: Sync to Hugging Face hub
 on:
   push:
-    branches: [deploy]
+    branches: [hf_deployment]
 
-  # to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   sync-to-hub:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Add remote
+      - name: Set up Git user
+        run: |
+          git config --global user.name "atodorov284"
+          git config --global user.email "atodorov284@gmail.com"
+      - name: Install Git LFS
+        run: git lfs install
+      - name: Add remote 
         run: git remote add space https://huggingface.co/spaces/03chrisk/air-quality-forecasting
-
       - name: Push to hub
         env:
           HF: ${{ secrets.HF }}
-        run: git push --force https://03chrisk:${{ secrets.HF }}@huggingface.co/spaces/03chrisk/air-quality-forecasting deploy:main
+        run: git push --force https://03chrisk:${{ secrets.HF }}@huggingface.co/spaces/03chrisk/air-quality-forecasting hf_deployment:main
