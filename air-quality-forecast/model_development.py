@@ -382,6 +382,36 @@ def train_all_models():
     )
 
 
+def train_one_model(
+    x_train: np.ndarray,
+    y_train: np.ndarray,
+    x_test: np.ndarray,
+    y_test: np.ndarray,
+    experiment_name: str,
+    model: str,
+    param_space: Dict[str, Any],
+    n_iter: int,
+) -> None:
+    if model == "decision_tree":
+        model = DecisionTreeRegressor()
+    elif model == "xgboost":
+        model = XGBRegressor()
+    elif model == "random_forest":
+        model = RandomForestRegressor()
+    else:
+        raise ValueError(f"Unknown model: {model}")
+    run_bayesian_optimization(
+        x_train,
+        y_train,
+        x_test,
+        y_test,
+        experiment_name=experiment_name,
+        regressor=model,
+        param_space=param_space,
+        n_iter=n_iter,
+    )
+
+
 if __name__ == "__main__":
     # train_all_models()
     RegressorTrainer.launch_mlflow_server()
