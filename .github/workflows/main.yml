@@ -1,7 +1,7 @@
 name: Sync to Hugging Face hub
 on:
   push:
-    branches: [hf_deployment]
+    branches: [deploy]
 
   workflow_dispatch:
 
@@ -23,4 +23,4 @@ jobs:
       - name: Push to hub
         env:
           HF: ${{ secrets.HF }}
-        run: git push --force https://03chrisk:${{ secrets.HF }}@huggingface.co/spaces/03chrisk/air-quality-forecasting hf_deployment:main
+        run: git push --force https://03chrisk:${{ secrets.HF }}@huggingface.co/spaces/03chrisk/air-quality-forecasting deploy:main
