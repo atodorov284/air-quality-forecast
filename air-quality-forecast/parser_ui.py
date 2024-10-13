@@ -1,14 +1,11 @@
 import argparse
 from prediction import PredictorModels
-from model_development import (
-    run_bayesian_optimization,
-    convert_param_space,
-    train_one_model,
-)
+from model_development import convert_param_space, train_one_model
 import joblib
 import os
 import pandas as pd
 import sys
+from typing import Dict, Tuple, Any
 import yaml
 
 
@@ -18,13 +15,13 @@ def create_parser() -> argparse.ArgumentParser:
     It is quite nice to use command line arguments if you just want to plot or test a single algorithm
     without having to run all other algorithms.
     """
-    parser = argparse.ArgumentParser(description="Retrain a model or predict.")
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "--retrain", type=bool, default=False, help="Re-train the model."
+    parser = argparse.ArgumentParser(
+        description="Retrain a model or predict. The retrain datasets need to be under data/retrain and the prediction dataset needs to be under data/inference."
     )
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--retrain", action="store_true", help="Re-train the model.")
     group.add_argument(
-        "--predict", type=bool, default=False, help="Predict using the trained model."
+        "--predict", action="store_true", help="Predict using the trained model."
     )
     if "--retrain" in sys.argv:
         parser.add_argument(
@@ -58,80 +55,139 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def load_data(
+    x_train_path: str, y_train_path: str, x_test_path: str, y_test_path: str
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Load the data from the given paths.
+    """
+    x_train = pd.read_csv(x_train_path)
+    y_train = pd.read_csv(y_train_path)
+    x_test = pd.read_csv(x_test_path)
+    y_test = pd.read_csv(y_test_path)
+    for df in [x_train, x_test, y_train, y_test]:
+        if df.columns[0] == "date":
+            df.set_index("date", inplace=True)
+    return x_train, y_train, x_test, y_test
+
+
+def normalize_data(normalizer, x_train, x_test) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Normalize the data using the given normalizer.
+    """
+    x_train = normalizer.transform(x_train)
+    x_test = normalizer.transform(x_test)
+    return x_train, x_test
+
+
+def train_model(
+    x_train: pd.DataFrame,
+    y_train: pd.DataFrame,
+    x_test: pd.DataFrame,
+    y_test: pd.DataFrame,
+    experiment_name: str,
+    model: str,
+    param_space: Dict[str, Any],
+    n_iter: int,
+) -> None:
+    """
+    Train a model using Bayesian optimization.
+    """
+    if model == "decision_tree":
+        train_one_model(
+            x_train,
+            y_train,
+            x_test,
+            y_test,
+            experiment_name=experiment_name,
+            model="decision_tree",
+            param_space=param_space,
+            n_iter=n_iter,
+        )
+    if model == "xgboost":
+        train_one_model(
+            x_train,
+            y_train,
+            x_test,
+            y_test,
+            experiment_name=experiment_name,
+            model="xgboost",
+            param_space=param_space,
+            n_iter=n_iter,
+        )
+    if model == "random_forest":
+        train_one_model(
+            x_train,
+            y_train,
+            x_test,
+            y_test,
+            experiment_name=experiment_name,
+            model="random_forest",
+            param_space=param_space,
+            n_iter=n_iter,
+        )
+
+
 def main():
     parser = create_parser()
+    args = parser.parse_args()
 
     project_root = os.path.dirname(os.path.dirname(__file__))
     saved_models_path = os.path.join(project_root, "saved_models")
     normalizer = joblib.load(os.path.join(saved_models_path, "normalizer.joblib"))
-    args = parser.parse_args()
-
-    retrain_data_folder = os.path.join(project_root, "data", "retrain")
-    x_train = pd.read_csv(os.path.join(retrain_data_folder, args.x_train_path))
-    x_test = pd.read_csv(os.path.join(retrain_data_folder, args.x_test_path))
-    y_train = pd.read_csv(os.path.join(retrain_data_folder, args.y_train_path))
-    y_test = pd.read_csv(os.path.join(retrain_data_folder, args.y_test_path))
-
-    x_train = normalizer.transform(x_train)
-    x_test = normalizer.transform(x_test)
-
-    predictor = PredictorModels()
-
-    configs_data_path = os.path.join(project_root, "configs")
-    with open(
-        os.path.join(configs_data_path, "hyperparameter_search_spaces.yaml"), "r"
-    ) as stream:
-        param_space_config = yaml.safe_load(stream)
-
-    param_space_config["decision_tree"] = convert_param_space(
-        param_space_config["decision_tree"]
-    )
-    param_space_config["xgboost"] = convert_param_space(param_space_config["xgboost"])
-    param_space_config["random_forest"] = convert_param_space(
-        param_space_config["random_forest"]
-    )
-
-    model = args.models
 
     if args.retrain:
-        if args.model == "decision_tree":
-            train_one_model(
-                x_train,
-                y_train,
-                x_test,
-                y_test,
-                experiment_name=f"retrain_{model}",
-                model="decision_tree",
-                param_space=param_space_config["decision_tree"],
-                n_iter=args.n_iter,
-            )
-        if args.model == "xgboost":
-            train_one_model(
-                x_train,
-                y_train,
-                x_test,
-                y_test,
-                experiment_name=f"retrain_{model}",
-                model="xgboost",
-                param_space=param_space_config["xgboost"],
-                n_iter=args.n_iter,
-            )
-        if args.model == "random_forest":
-            train_one_model(
-                x_train,
-                y_train,
-                x_test,
-                y_test,
-                experiment_name=f"retrain_{model}",
-                model="random_forest",
-                param_space=param_space_config["random_forest"],
-                n_iter=args.n_iter,
-            )
-            
+        x_train, y_train, x_test, y_test = load_data(
+            args.x_train_path, args.y_train_path, args.x_test_path, args.y_test_path
+        )
+        x_train, x_test = normalize_data(normalizer, x_train, x_test)
+
+        configs_data_path = os.path.join(project_root, "configs")
+        with open(
+            os.path.join(configs_data_path, "hyperparameter_search_spaces.yaml"), "r"
+        ) as stream:
+            param_space_config = yaml.safe_load(stream)
+
+        param_space_config["decision_tree"] = convert_param_space(
+            param_space_config["decision_tree"]
+        )
+        param_space_config["xgboost"] = convert_param_space(
+            param_space_config["xgboost"]
+        )
+        param_space_config["random_forest"] = convert_param_space(
+            param_space_config["random_forest"]
+        )
+
+        train_model(
+            x_train,
+            y_train,
+            x_test,
+            y_test,
+            experiment_name=f"retrain_{args.model}",
+            model=args.model,
+            param_space=param_space_config[args.model],
+            n_iter=args.n_iter,
+        )
+
     if args.predict:
-        if args.decision_tree:
-            predictor.decision_tree_predictions(x_train)
-        if args.random_forest:
-            predictor.random_forest_predictions(x_train)
-        if args.xgboost:
-            predictor.xgb_predictions(x_train)
+        inference_data_folder = os.path.join(project_root, "data", "inference")
+        predict_dataset = pd.read_csv(
+            os.path.join(inference_data_folder, args.prediction_dataset)
+        )
+        if predict_dataset.columns[0] == "date":
+            predict_dataset.set_index("date", inplace=True)
+
+        predictor = PredictorModels()
+        model = args.model
+        if model == "decision_tree":
+            y_pred = predictor.decision_tree_predictions(predict_dataset)
+        if model == "random_forest":
+            y_pred = predictor.random_forest_predictions(predict_dataset)
+        if model == "xgboost":
+            y_pred = predictor.xgb_predictions(predict_dataset)
+
+        print(pd.DataFrame(y_pred).head())
+
+
+if __name__ == "__main__":
+    main()
