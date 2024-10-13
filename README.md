@@ -1,3 +1,14 @@
+---
+title: Air Quality Forecasting
+emoji: 📈
+colorFrom: yellow
+colorTo: gray
+sdk: streamlit
+sdk_version: 1.39.0
+app_file: app.py
+pinned: false
+---
+
 # Air Quality Forecast
 
 <a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
