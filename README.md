@@ -18,7 +18,25 @@ To see the MLFlow dashboard, used to track experiments, run model_development.py
 `mlflow ui --port 5000`
 in your console. You might need to give admin permissions to this process. The MLFlow dashboard contains all information about the experiments ran, including hyperparameters selected for each model. The selected models can be found under the Models menu.
 
-To run the prediction, run `main.py`. It will display the MSE and RMSE of the train and test data for all three models.
+To retrain a model or predict, run `main.py` with the following arguments:
+positional arguments:
+  {xgboost,decision_tree,random_forest}
+                        Model to retrain or predict.
+
+options:
+  -h, --help            show this help message and exit
+  --retrain             Re-train the model.
+  --predict             Predict using the trained model.
+
+
+**IMPORTANT**
+The retrain datasets need to be under data/retrain and the prediction dataset needs to be under data/inference.
+
+If --retrain is selected, specify the dataset name, which has to be under data/inference. For example, if the dataset is named x_test.csv and you want to predict using the xgboost model, run:
+`main.py --predict --prediction_dataset x_test.csv xgboost`
+
+Similarly, to retrain xgboost for example, run:
+`main.py --retrain --x_train x_train.csv --x_test x_test.csv --y_train y_train.csv --y_test y_test.csv --n_iter 50 xgboost`
 
 ## DISCLAIMER
 
