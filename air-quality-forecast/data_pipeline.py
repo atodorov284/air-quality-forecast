@@ -5,6 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from typing import Tuple
 import numpy as np
+import joblib
 
 
 class DataLoader:
@@ -287,6 +288,12 @@ class PreprocessingPipeline:
             x_train[x_train.columns]
         )
         x_test[x_test.columns] = self.normalizer.transform(x_test[x_test.columns])
+
+        project_root = os.path.dirname(os.path.dirname(__file__))
+        saved_models_path = os.path.join(project_root, "saved_models")
+        joblib.dump(
+            self.normalizer, os.path.join(saved_models_path, "normalizer.joblib")
+        )
 
         # Convert the normalized NumPy array back to a DataFrame
         # normalized_x_train = pd.DataFrame(x_train, columns=preprocessed_data.columns, index=preprocessed_data.index)
