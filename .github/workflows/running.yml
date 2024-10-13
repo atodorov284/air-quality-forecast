@@ -10,6 +10,7 @@ on:
       - main
       - data_engineering
       - model_development
+      - pre_production
 
 jobs:
   check-reproducibility:
@@ -26,4 +27,4 @@ jobs:
       - name: Run main.py
         id: run_main
         run: |
-          python3 air-quality-forecast/main.py
+          python3 air-quality-forecast/main.py -h
