@@ -4,24 +4,3 @@ notebooks/* linguist-vendored
 *.html linguist-vendored
 *.xgb filter=lfs diff=lfs merge=lfs -text
 *.pkl filter=lfs diff=lfs merge=lfs -text
-mlartifacts/149819317988706962/135e604974134ca4877227251e765174/artifacts/model/model.pkl filter=lfs diff=lfs merge=lfs -text
-mlartifacts/149819317988706962/5479a322736e4663944d983720a6648e/artifacts/model/model.pkl filter=lfs diff=lfs merge=lfs -text
-mlartifacts/149819317988706962/d256fba7a7fe43c39749afef37154210/artifacts/model/model.pkl filter=lfs diff=lfs merge=lfs -text
-mlartifacts/674375719018272828/2ad059c5d4704ed088a288d572818bcf/artifacts/model/model.xgb filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/475209732522917118/6bfd7856e3624d38aadfd33e3fc79343/artifacts/best_model/model.pkl filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/475209732522917118/d6de58a8b1b9445a8da3f306598e1754/artifacts/model/model.pkl filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/475209732522917118/e8a145a55c094cdc9e55c7b9d5a89bf5/artifacts/model/model.pkl filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/588532547813609546/29a7ce3e5aff4004b017460bf6d2274b/artifacts/model/model.xgb filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/588532547813609546/f8998a2203ac4d6bacfa9e2fe9e15a2a/artifacts/best_model/model.pkl filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/588532547813609546/fcc0e9c35f1a4a88a44f203406bf3ccd/artifacts/best_model/model.pkl filter=lfs diff=lfs merge=lfs -text
-mlartifacts/**/*.pkl filter=lfs diff=lfs merge=lfs -text
-mlartifacts/**/*.xgb filter=lfs diff=lfs merge=lfs -text
-mlartifacts/**/artifacts/model/*.pkl filter=lfs diff=lfs merge=lfs -text
-mlartifacts/**/artifacts/model/*.xgb filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/**/artifacts/model/*.pkl filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/**/artifacts/model/*.xgb filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/475209732522917118/6bfd7858dbb5497d8b360a75c6933267/artifacts/best_model/model.pkl filter=lfs diff=lfs merge=lfs -text
-mlartifacts/149819317988706962/**/artifacts/model/*.pkl filter=lfs diff=lfs merge=lfs -text
-mlartifacts/149819317988706962/**/artifacts/model/*.xgb filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/475209732522917118/**/artifacts/model/*.pkl filter=lfs diff=lfs merge=lfs -text
-notebooks/mlartifacts/588532547813609546/**/artifacts/model/*.xgb filter=lfs diff=lfs merge=lfs -text
