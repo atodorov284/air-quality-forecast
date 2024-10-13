@@ -10,6 +10,7 @@ on:
       - main
       - data_engineering
       - model_development
+      - pre_production
 
 jobs:
   flake8_py3:
