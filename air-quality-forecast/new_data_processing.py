@@ -1,5 +1,11 @@
 import pandas as pd
 from data_pipeline import FeatureProcessor
+import sys
+import os
+
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
 
 
 def merge_data(aqi_path=None, vc_path=None):
@@ -55,8 +61,8 @@ def save_to_csv(result, path):
 if __name__ == "__main__":
     print("BEFORE RUNNING MAKE SURE THAT THE DATA IS UPDATED BY CALLING",
           "api_data_call.py")
-    aqi_path = "previousdaysAQI.csv"
-    vc_path = "data.csv"
+    aqi_path = "data/api_data/previousdaysAQI.csv"
+    vc_path = "data/api_data/previousdaysVC.csv"
     result = merge_data(aqi_path, vc_path)
     result = reshape_data(result)
 
@@ -78,6 +84,6 @@ if __name__ == "__main__":
 
     # save the data to a CSV file
     result = result.head(1)
-    path = "currentdata.csv"
+    path = "data/api_data/currentdata.csv"
     save_to_csv(result, path)
     print(f"Data saved to {path}")
