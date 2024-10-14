@@ -1,4 +1,4 @@
 import streamlit as st
+from user_dashboard import *
 
-x = st.slider("Select a value")
-st.write(x, "squared is", x * x)
+show_user_dashboard()
