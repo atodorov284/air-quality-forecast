@@ -5,15 +5,18 @@ from controllers.admin_controller import AdminController
 from views.home_view import HomeView
 import hashlib
 
+
 class HomeController:
-    __ADMIN_PASSWORD_HASH = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'
+    __ADMIN_PASSWORD_HASH = (
+        "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"
+    )
 
     def __init__(self):
         self.home_view = HomeView()
         self.user_controller = UserController()
         self.admin_controller = AdminController()
         self._run()
-        
+
     def _hash_password(self, password):
         """Hash the input password using SHA-256."""
         return hashlib.sha256(password.encode()).hexdigest()

@@ -3,13 +3,14 @@ import streamlit as st
 import pandas as pd
 from datetime import date
 
+
 class UserView:
     def show_current_data(self, today_data, who_guidelines):
         st.sidebar.markdown(f"Today's Date: **{date.today().strftime('%B %d, %Y')}**")
         st.sidebar.markdown("### Current Pollutant Concentrations")
         today_data_df = pd.DataFrame([today_data])
         st.sidebar.dataframe(today_data_df.style.hide(axis="index"))
-        
+
         st.sidebar.markdown("### WHO Guidelines")
         who_guidelines_df = pd.DataFrame(who_guidelines)
         st.sidebar.dataframe(who_guidelines_df.style.hide(axis="index"))
