@@ -1,4 +1,4 @@
-import streamlit as st
-from user_dashboard import *
-
-show_user_dashboard()
+from controllers.home_controller import HomeController
+    
+if __name__ == "__main__":
+    HomeController()
