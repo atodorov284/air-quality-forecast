@@ -20,7 +20,7 @@ class UserController:
 
         # Display current data and predictions
         self.view.show_current_data(today_data, who_guidelines)
-        self.view.display_predictions(next_three_days)
+        self.view.display_predictions(next_three_days, who_guidelines)
 
         # Compare to WHO guidelines
         self.view.compare_to_who(
