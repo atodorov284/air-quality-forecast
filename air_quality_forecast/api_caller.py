@@ -11,6 +11,7 @@ class APICaller:
         self._components_griftpark = "O3,NO2,PM25"
         self._components_erzeijstraat = "PM10"
         self._vc_base_url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/weatherdata/history"
+        # probably need to hide this lol (it's Lukasz' key but its public anyway)
         self._vc_key = "3LBMJ7SAH5BCSL5H2DYS5YQ5K"
         self._vc_max_wait = 10
         self._vc_successful = 200
