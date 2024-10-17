@@ -93,8 +93,8 @@ class APICaller:
 
         :return: A pandas DataFrame with the weather data for the last three days.
         """
-        start_date = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%dT00:00:00")
-        end_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        start_date = self._three_days_ago()
+        end_date = self._current_time()
         url = f"{self._vc_base_url}?&aggregateHours=24&startDateTime={start_date}&endDateTime={end_date}&unitGroup=metric&contentType=json&dayStartTime=0:0:00&dayEndTime=0:0:00&location=Utrecht&key={self._vc_key}"
 
         try:
@@ -135,8 +135,52 @@ class APICaller:
             print(f"Other error occurred: {err}")
             return pd.DataFrame()
 
+    def lag_data(self) -> pd.DataFrame:
+        """
+        Lag the air quality and weather data into a single row.
+
+        :return: DataFrame with lagged data in a single row.
+        """
+        air_data = self.get_luchtmeet_data()
+        weather_data = self.get_vc_data()
+
+        print(air_data)
+        print(weather_data)
+
+        df = pd.merge(air_data, weather_data, on="date")
+
+        # Need to reindex for model
+        df = df.reindex(
+            columns=[
+                "PM25",
+                "PM10",
+                "O3",
+                "NO2",
+                "temp",
+                "humidity",
+                "visibility",
+                "solarradiation",
+                "precip",
+                "wspd",
+                "wdir",
+            ]
+        )
+
+        flattened = df.to_numpy().flatten()
+
+        new_column_names = []
+        for day_offset in reversed(range(len(df))):
+            for col in df.columns:
+                new_column_names.append(f"{col} - day {day_offset}")
+
+        lagged_df = pd.DataFrame([flattened], columns=new_column_names)
+
+        lagged_df.insert(0, "date", df.index[-1].strftime("%m/%d/%Y"))
+
+        lagged_df.set_index("date", inplace=True)
+        return lagged_df
+
 
 if __name__ == "__main__":
     caller = APICaller()
-    print(caller.get_vc_data())
-    print(caller.get_luchtmeet_data())
+    print(caller.lag_data())
