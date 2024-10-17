@@ -5,6 +5,10 @@ from datetime import datetime, timedelta
 
 class APICaller:
     def __init__(self) -> None:
+        """
+        Initializes the APICaller class. Gets the luchtmeet data for the griftpark and erzeijstraat stations.
+        Also can merge the data and present it in a lagged format for the model's input.
+        """
         self._luchtmeet_griftpark = "NL10643"
         self._luchtmeet_erzeijstraat = "NL10639"
         self._base_luchtmeet_url = "https://api.luchtmeetnet.nl/open_api/measurements"
@@ -14,7 +18,7 @@ class APICaller:
         # probably need to hide this lol (it's Lukasz' key but its public anyway)
         self._vc_key = "3LBMJ7SAH5BCSL5H2DYS5YQ5K"
         self._vc_max_wait = 10
-        self._vc_successful = 200
+        self._successful_request_code = 200
 
     def _current_time(self) -> str:
         """
@@ -41,7 +45,7 @@ class APICaller:
         url = f"{self._base_luchtmeet_url}?station_number={station_number}&components={components}&page=1&order_by=timestamp_measured&order_direction=desc&start={start_time}&end={end_time}"
 
         response = requests.get(url)
-        if response.status_code == 200:
+        if response.status_code == self._successful_request_code:
             return response.json().get("data", [])
         else:
             raise Exception(
@@ -103,7 +107,7 @@ class APICaller:
             response.raise_for_status()
             data = response.json()
 
-            if response.status_code == self._vc_successful:
+            if response.status_code == self._successful_request_code:
                 selected_columns = [
                     "datetimeStr",
                     "temp",
