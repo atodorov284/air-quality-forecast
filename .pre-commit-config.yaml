@@ -1,4 +1,9 @@
 repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+      - id: ruff-format
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
@@ -17,12 +22,6 @@ repos:
     rev: v2.5.1
     hooks:
       - id: prettier
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
-    hooks:
-      - id: ruff
-      - id: ruff-format
 
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.4
