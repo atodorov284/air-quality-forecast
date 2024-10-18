@@ -8,6 +8,7 @@ import random
 import os
 
 FACTS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "facts.json")
+
 QUESTIONS_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "question.json"
 )
@@ -245,7 +246,7 @@ class UserView:
             st.write("""
             **Ozone (O₃):** Formed by chemical reactions in the atmosphere, particularly on sunny days.
             High levels can cause chest pain, coughing, throat irritation, and airway inflammation.
-            
+
             **Nitrogen Dioxide (NO₂):** Mostly emitted from vehicles and industrial activities, this can cause
             irritation of the respiratory system and decrease lung function, especially during long-term exposure.
             """)
@@ -284,12 +285,12 @@ class UserView:
             "[Air Pollution Facts](https://www.un.org/sustainabledevelopment/air-pollution/)"
         )
 
-    def quiz(self):
+    def quiz(self, question_nr=0):
         with open(QUESTIONS_PATH, "r") as f:
             quiz_data = json.load(f)
         # Access the quiz questions
         questions = quiz_data["quiz"]
-        random_question = random.choice(questions)
+        random_question = questions[question_nr]
 
         # Add a simple quiz to engage the user
         st.markdown("### Quick Quiz: How Much Do You Know About Air Pollution?")
@@ -308,7 +309,7 @@ class UserView:
                         "Incorrect. The correct answer is: " + random_question["answer"]
                     )
 
-    def raise_awareness_and_quiz(self, today_data, who_guidelines):
+    def raise_awareness_and_quiz(self, today_data, who_guidelines, question_nr=0):
         # Create two columns: main column for awareness and right column for the quiz
         col_main, col_right = st.columns(
             [0.7, 0.3], gap="large"
@@ -320,7 +321,7 @@ class UserView:
 
         # Right column: Quiz
         with col_right:
-            self.quiz()
+            self.quiz(question_nr)
 
     def add_spaces(self, num_lines=1):
         """Add vertical space between sections by adding empty lines.

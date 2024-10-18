@@ -1,11 +1,13 @@
 from models.air_quality_model import AirQualityModel
 from views.user_view import UserView
+import numpy as np
 
 
 class UserController:
     def __init__(self):
         self.model = AirQualityModel()
         self.view = UserView()
+        self.is_first_run = True
 
     def show_dashboard(self):
         # Get today's data and predictions
@@ -20,7 +22,11 @@ class UserController:
 
         # Display current data and predictions
         self.view.show_current_data(today_data, who_guidelines)
-        self.view.raise_awareness_and_quiz(today_data, who_guidelines)
+        if self.is_first_run:
+            question_choice = np.random.randint(0, 5)
+        self.view.raise_awareness_and_quiz(
+            today_data, who_guidelines, question_nr=question_choice
+        )
         plot_type = self.view.view_option_selection()
         if plot_type == "Line Plot":
             self.view.display_predictions_lineplot(next_three_days, who_guidelines)
@@ -34,3 +40,5 @@ class UserController:
 
         # Print sources
         self.view.print_sources()
+
+        self.is_first_run = False
