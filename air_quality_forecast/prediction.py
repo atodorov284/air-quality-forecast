@@ -6,6 +6,7 @@ from sklearn.metrics import root_mean_squared_error, mean_squared_error
 import pickle
 import xgboost
 import joblib
+from copy import deepcopy
 
 
 class PredictorModels:
@@ -72,6 +73,8 @@ class PredictorModels:
             raise ValueError("x_test is None")
         if x_test.ndim != 2:
             raise ValueError("x_test must be 2 dimensional, got {}".format(x_test.ndim))
+
+        x_test = deepcopy(x_test)
 
         x_test.columns = [
             "pm25 - day 1",
