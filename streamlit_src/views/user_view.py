@@ -16,7 +16,7 @@ class UserView:
                 today_data["NO2 (µg/m³)"],
                 today_data["O3 (µg/m³)"],
             ],
-            "WHO Guideline (µg/m³)": [
+            "WHO Guideline": [
                 who_guidelines["WHO Guideline"][0],  # NO2 guideline
                 who_guidelines["WHO Guideline"][1],  # O3 guideline
             ],
@@ -28,14 +28,18 @@ class UserView:
         st.sidebar.markdown("### Current Pollutant Concentrations and WHO Guidelines")
         st.sidebar.dataframe(merged_data_df, hide_index=True)
 
-    def display_predictions_lineplot(self, next_three_days, who_guidelines):
-        st.markdown("### Predictions for the Next 3 Days")
-
-        # Convert date to datetime and calculate future dates
+    def get_next_three_days_dates(self):
         today = datetime.now()  # Get the current date and time
         tomorrow = today + timedelta(days=1)
         day_after_tomorrow = today + timedelta(days=2)
         two_days_after_tomorrow = today + timedelta(days=3)
+        return tomorrow, day_after_tomorrow, two_days_after_tomorrow
+
+    def display_predictions_lineplot(self, next_three_days, who_guidelines):
+        st.markdown("### Predictions for the Next 3 Days")
+
+        tomorrow, day_after_tomorrow, two_days_after_tomorrow = \
+            self.get_next_three_days_dates()
 
         # Update the dataframe with actual dates in datetime format
         next_three_days["Date"] = [
@@ -100,18 +104,41 @@ class UserView:
         # Display the plot in Streamlit
         st.plotly_chart(fig)
 
+    def get_no2_color(self, value, who_limit):
+        # Define the gradient points
+        if value <= who_limit:
+            # Blue -> Purple gradient
+            return f"rgba({int(0 + (255 * value / who_limit))}, 0, 255, 1)"  # Gradient from blue to purple
+        else:
+            # Purple -> Red gradient
+            excess_value = min(who_limit, value - who_limit)
+            return f"rgba(255, 0, {int(255 - (255 * excess_value / who_limit))}, 1)"  # Gradient from purple to red
+
     def display_predictions_gaugeplot(self, next_three_days, who_guidelines):
         st.markdown("### Predictions for the Next 3 Days")
+        # Convert date to datetime and calculate future dates
+        tomorrow, day_after_tomorrow, two_days_after_tomorrow = \
+            self.get_next_three_days_dates()
 
+        # Update the dataframe with actual dates in datetime format
+        next_three_days["Date"] = [
+            tomorrow,
+            day_after_tomorrow,
+            two_days_after_tomorrow,
+        ]
         for i in range(3):
             formatted_date = next_three_days["Date"][i].strftime("%B %d, %Y")
 
             st.markdown(f"#### Day {i+1}: {formatted_date}")
 
-            col1, col2 = st.columns([1, 1], gap="small")
+            # use multiple columns for centering
+            _, col1, _, col2, _ = st.columns([0.2, 1, 0.2, 1, 0.2], gap="small")
 
             # NO2 Gauge
             with col1:
+                # Get color based on NO2 value
+                no2_value = next_three_days["NO2 (µg/m³)"][i]
+                no2_color = self.get_no2_color(no2_value, who_guidelines["WHO Guideline"][0])
                 fig_no2 = go.Figure(
                     go.Indicator(
                         mode="gauge+number",
@@ -124,7 +151,7 @@ class UserView:
                                     max(who_guidelines["WHO Guideline"][0], 100),
                                 ]
                             },
-                            "bar": {"color": "blue"},
+                            "bar": {"color": no2_color},
                         },
                         domain={"x": [0, 1], "y": [0, 1]},  # Controls size
                     )
@@ -158,9 +185,12 @@ class UserView:
                 )
                 st.plotly_chart(fig_o3)
 
-    def display_predictions(self, next_three_days, who_guidelines):
-        self.display_predictions_lineplot(next_three_days, who_guidelines)
-        self.display_predictions_gaugeplot(next_three_days, who_guidelines)
+    def view_option_selection(self) -> str:
+        plot_type = st.selectbox(
+            "Choose Visualization Type",
+            ("Line Plot", "Gauge Plot")
+        )
+        return plot_type
 
     def compare_to_who(self, today_data, no2_level, o3_level):
         if today_data["NO2 (µg/m³)"] > no2_level:
@@ -172,3 +202,19 @@ class UserView:
             st.sidebar.error("⚠️ O3 levels are above WHO guidelines!")
         else:
             st.sidebar.success("✅ O3 levels are within safe limits.")
+
+    def raise_awareness(self):
+        st.sidebar.markdown("""
+        **Air pollution** is a serious concern that affects the environment and public health. 
+        High levels of pollutants, such as ozone (O₃) and nitrogen dioxide (NO₂), can lead to 
+        respiratory problems, aggravate pre-existing conditions like asthma, and contribute to 
+        cardiovascular diseases. On particularly bad days, vulnerable groups such as children, 
+        the elderly, and those with respiratory issues are at even greater risk. 
+        """)
+
+        st.sidebar.markdown("""
+        **Key Pollutants:**
+        - **Ozone (O₃):** Formed by chemical reactions in the atmosphere, particularly on sunny days.
+        - **Nitrogen Dioxide (NO₂):** Mostly emitted from vehicles and industrial activities, this can cause 
+        irritation of the respiratory system.
+        """)
