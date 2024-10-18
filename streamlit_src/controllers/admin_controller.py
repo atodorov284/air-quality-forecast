@@ -144,7 +144,7 @@ class AdminController(UserController):
         data_without_date = data.drop(columns=["date"], errors="ignore")
 
         if (
-            not data_without_date.applymap(
+            not data_without_date.map(
                 lambda x: isinstance(x, (float, int)) or pd.isna(x)
             )
             .all()
@@ -204,7 +204,7 @@ class AdminController(UserController):
         ood_rows = out_of_distribution_flags.sum(axis=1)
 
         if ood_rows.any():
-            error_message = f"Input data contains out-of-distribution values. {ood_rows.sum()} {'feature exceeds' if ood_rows.sum() == 1 else 'features exceed'} the z-score threshold.\n\n"
+            error_message = f"Input data contains out-of-distribution values. {ood_rows.sum()} {'feature exceeds' if ood_rows.sum() == 1 else 'features exceed'} the z-score threshold. Model prediction might be innacurate\n\n"
             error_message += "Out-of-distribution values detected:\n"
 
             ood_details = z_scores[out_of_distribution_flags]
