@@ -173,7 +173,7 @@ class APICaller:
         flattened = df.to_numpy().flatten()
 
         new_column_names = []
-        for day_offset in reversed(range(len(df))):
+        for day_offset in range(len(df)):
             for col in df.columns:
                 new_column_names.append(f"{col} - day {day_offset}")
 
