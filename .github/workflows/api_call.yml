@@ -23,7 +23,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Python script
-        run: |
-          python air_quality_forecast/api_caller.py
         env:
           VC_API_KEY: ${{ secrets.VC_API_KEY }}
+        run: |
+          python air_quality_forecast/api_caller.py
