@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.metrics import root_mean_squared_error, mean_squared_error
-import pickle
 import xgboost
 
 
@@ -42,12 +41,12 @@ class PredictorModels:
         project_root = os.path.dirname(os.path.dirname(__file__))
         models_path = os.path.join(project_root, "saved_models")
 
-        self._d_tree = pickle.load(
-            open(os.path.join(models_path, "decision_tree.pkl"), "rb")
-        )
-        self._random_forest = pickle.load(
-            open(os.path.join(models_path, "random_forest.pkl"), "rb")
-        )
+        # self._d_tree = pickle.load(
+        #     open(os.path.join(models_path, "decision_tree.pkl"), "rb")
+        # )
+        # self._random_forest = pickle.load(
+        #     open(os.path.join(models_path, "random_forest.pkl"), "rb")
+        # )
         self._xgboost.load_model(os.path.join(models_path, "xgboost.xgb"))
 
     def xgb_predictions(self, x_test: pd.DataFrame) -> np.ndarray:
