@@ -14,7 +14,7 @@ def main():
     caller = APICaller()
     all_predictions = caller.lag_data()
 
-    df = pd.DataFrame(predictor.xgb_predictions(all_predictions))
+    df = pd.DataFrame(predictor.xgb_predictions(all_predictions, normalized=False))
     df.columns = [
         "NO2 + day 1",
         "O3 + day 1",

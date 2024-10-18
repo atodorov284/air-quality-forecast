@@ -5,6 +5,7 @@ from sklearn.base import BaseEstimator
 from sklearn.metrics import root_mean_squared_error, mean_squared_error
 import pickle
 import xgboost
+import joblib
 
 
 class PredictorModels:
@@ -50,7 +51,7 @@ class PredictorModels:
         )
         self._xgboost.load_model(os.path.join(models_path, "xgboost.xgb"))
 
-    def xgb_predictions(self, x_test: pd.DataFrame) -> np.ndarray:
+    def xgb_predictions(self, x_test: pd.DataFrame, normalized: bool) -> np.ndarray:
         """
         Makes predictions using the loaded XGBoost regressor.
 
@@ -58,6 +59,9 @@ class PredictorModels:
         ----------
         x_test : pd.DataFrame
             Data points to make predictions on.
+
+        normalized : bool
+            Whether the data is normalized or not.
 
         Returns
         -------
@@ -68,6 +72,15 @@ class PredictorModels:
             raise ValueError("x_test is None")
         if x_test.ndim != 2:
             raise ValueError("x_test must be 2 dimensional, got {}".format(x_test.ndim))
+
+        if not normalized:
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            saved_models_path = os.path.join(project_root, "saved_models")
+            normalizer = joblib.load(
+                os.path.join(saved_models_path, "normalizer.joblib")
+            )
+            x_test = normalizer.transform(x_test)
+
         xgb_test = xgboost.DMatrix(x_test)
         y_pred = self._xgboost.predict(xgb_test)
         return y_pred
@@ -123,7 +136,7 @@ if __name__ == "__main__":
 
     y_test_pred_dtree = predictor.decision_tree_predictions(x_train)
     y_test_pred_rf = predictor.random_forest_predictions(x_train)
-    y_test_pred_xgb = predictor.xgb_predictions(x_train)
+    y_test_pred_xgb = predictor.xgb_predictions(x_train, normalized=True)
 
     print("Train Decision Tree MSE: ", mean_squared_error(y_train, y_test_pred_dtree))
     print("Train Random Forest MSE: ", mean_squared_error(y_train, y_test_pred_rf))
@@ -143,7 +156,7 @@ if __name__ == "__main__":
 
     y_test_pred_dtree = predictor.decision_tree_predictions(x_test)
     y_test_pred_rf = predictor.random_forest_predictions(x_test)
-    y_test_pred_xgb = predictor.xgb_predictions(x_test)
+    y_test_pred_xgb = predictor.xgb_predictions(x_test, normalized=True)
 
     print("Test Decision Tree MSE: ", mean_squared_error(y_test, y_test_pred_dtree))
     print("Test Random Forest MSE: ", mean_squared_error(y_test, y_test_pred_rf))
