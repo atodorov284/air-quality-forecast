@@ -34,3 +34,9 @@ jobs:
           VC_KEY: ${{ secrets.VC_KEY }}
         run: |
           python air_quality_forecast/get_prediction_data.py
+
+      - name: Upload prediction CSV as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: current-prediction-data
+          path: data/inference/current_prediction_data.csv
