@@ -66,41 +66,6 @@ class AdminController(UserController):
                         "date" if "date" in data.columns else "datetime", inplace=True
                     )
 
-                data.columns = [
-                    "pm25 - day 1",
-                    "pm10 - day 1",
-                    "o3 - day 1",
-                    "no2 - day 1",
-                    "temp - day 1",
-                    "humidity - day 1",
-                    "visibility - day 1",
-                    "solarradiation - day 1",
-                    "precip - day 1",
-                    "windspeed - day 1",
-                    "winddir - day 1",
-                    "pm25 - day 2",
-                    "pm10 - day 2",
-                    "o3 - day 2",
-                    "no2 - day 2",
-                    "temp - day 2",
-                    "humidity - day 2",
-                    "visibility - day 2",
-                    "solarradiation - day 2",
-                    "precip - day 2",
-                    "windspeed - day 2",
-                    "winddir - day 2",
-                    "pm25 - day 3",
-                    "pm10 - day 3",
-                    "o3 - day 3",
-                    "no2 - day 3",
-                    "temp - day 3",
-                    "humidity - day 3",
-                    "visibility - day 3",
-                    "solarradiation - day 3",
-                    "precip - day 3",
-                    "windspeed - day 3",
-                    "winddir - day 3",
-                ]
                 self._view.display_datatable(data, message="### User Data")
 
                 prediction = self._make_prediction(data)
