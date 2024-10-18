@@ -7,10 +7,12 @@ import json
 import random
 import os
 
-FACTS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "facts.json")
+FACTS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "json_interactions/", "facts.json"
+)
 
 QUESTIONS_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), "question.json"
+    os.path.dirname(os.path.dirname(__file__)), "json_interactions/", "question.json"
 )
 
 
