@@ -340,7 +340,7 @@ class UserController:
         Returns:
             go.Figure: A Plotly figure representing the gauge plot.
         """
-        color = "green" if value <= guideline else "red"
+        color = self._get_color(value, guideline)
         fig = go.Figure(
             go.Indicator(
                 mode="gauge+number",
@@ -351,3 +351,27 @@ class UserController:
         )
         fig.update_layout(height=250, width=250, margin=dict(t=0, b=0, l=0, r=0))
         return fig
+
+    def _get_color(self, value: float, who_limit: float) -> str:
+        """
+        Calculate a color based on a given pollutant value and WHO guideline.
+
+        Args:
+            value (float): The pollutant concentration value.
+            who_limit (float): The WHO guideline value for the pollutant.
+
+        Returns:
+            str: A hex color code representing the calculated color.
+        """
+        half_who_limit = who_limit / 2
+
+        if value <= half_who_limit:
+            # Green -> Yellow gradient
+            return f"rgba({int(255 * value / half_who_limit)}, 255, 0, 1)"  # Gradient from green to yellow
+        elif value <= who_limit:
+            # Yellow -> Red gradient
+            excess_value = value - half_who_limit
+            return f"rgba(255, {int(255 - (255 * excess_value / half_who_limit))}, 0, 1)"  # Gradient from yellow to red
+        else:
+            # Beyond the WHO limit, fully red
+            return "rgba(255, 0, 0, 1)"  # Fully red
