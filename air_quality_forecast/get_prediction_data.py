@@ -24,6 +24,7 @@ def main():
 
     save_dir = os.path.join(project_root, "data", "inference")
 
+    pd.DataFrame(current_data).to_csv(os.path.join(save_dir, "last_three_days.csv"))
     df.to_csv(os.path.join(save_dir, "current_prediction_data.csv"))
 
 
