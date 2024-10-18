@@ -28,11 +28,11 @@ class APICaller:
         """
         return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
-    def _three_days_ago(self) -> str:
+    def _two_days_ago(self) -> str:
         """
         Returns the date and time three days before the current time.
         """
-        return (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%dT%H:%M:%S")
+        return (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%dT%H:%M:%S")
 
     def _get_luchtmeet_data(self, components: str, station_number: int) -> list:
         """
@@ -43,7 +43,7 @@ class APICaller:
         :return: List of JSON data from the API response for the given components.
         """
         end_time = self._current_time()
-        start_time = self._three_days_ago()
+        start_time = self._two_days_ago()
         url = f"{self._base_luchtmeet_url}?station_number={station_number}&components={components}&page=1&order_by=timestamp_measured&order_direction=desc&start={start_time}&end={end_time}"
 
         response = requests.get(url)
@@ -100,7 +100,7 @@ class APICaller:
 
         :return: A pandas DataFrame with the weather data for the last three days.
         """
-        start_date = self._three_days_ago()
+        start_date = self._two_days_ago()
         end_date = self._current_time()
         url = f"{self._vc_base_url}?&aggregateHours=24&startDateTime={start_date}&endDateTime={end_date}&unitGroup=metric&contentType=json&dayStartTime=0:0:00&dayEndTime=0:0:00&location=Utrecht&key={self._vc_key}"
 
