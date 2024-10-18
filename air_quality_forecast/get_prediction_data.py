@@ -28,4 +28,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    project_root = os.path.dirname(os.path.dirname(__file__))
+    parent_dir = os.path.dirname(project_root)
+    sys.path.append(parent_dir)
+
+    predictor = PredictorModels()
