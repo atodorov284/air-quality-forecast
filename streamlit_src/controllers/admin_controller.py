@@ -1,3 +1,4 @@
+import os
 from views.admin_view import AdminView
 import streamlit as st
 from controllers.user_controller import UserController
@@ -60,7 +61,11 @@ class AdminController(UserController):
             if dataset is not None:
                 data = pd.read_csv(dataset)
 
-                self._perform_data_validation(data)
+                if not self._data_is_valid(data):
+                    return
+
+                self._check_data_out_of_distribution(data)
+
                 if "date" in data.columns or "datetime" in data.columns:
                     data.set_index(
                         "date" if "date" in data.columns else "datetime", inplace=True
@@ -108,11 +113,108 @@ class AdminController(UserController):
 
         return prediction
 
-    def _perform_data_validation(self, data: pd.DataFrame) -> None:
+    def _data_is_valid(self, data: pd.DataFrame) -> bool:
         """
-        Performs data validation on the user data.
+        Performs data validation on the uploaded user data.
 
         Args:
             data (pd.DataFrame): The user data.
+
+        Returns:
+            bool: True if the data is valid, otherwise False.
         """
-        pass
+        columns = data.columns
+        expected_columns_count = 33
+        has_date_column = "date" in columns
+
+        if has_date_column:
+            if len(columns) != expected_columns_count + 1:
+                self._view.error(
+                    f"Invalid column count. Expected {expected_columns_count + 1} columns including 'date', but got {len(columns)}."
+                )
+                return False
+        else:
+            # Dataset should have exactly 33 columns
+            if len(columns) != expected_columns_count:
+                self._view.error(
+                    f"Invalid column count. Expected {expected_columns_count} columns, but got {len(columns)}."
+                )
+                return False
+
+        data_without_date = data.drop(columns=["date"], errors="ignore")
+
+        if (
+            not data_without_date.applymap(
+                lambda x: isinstance(x, (float, int)) or pd.isna(x)
+            )
+            .all()
+            .all()
+        ):
+            self._view.error(
+                "The dataset contains values that are not floats or NaN. All values must be floats or NaN."
+            )
+            return False
+
+        if not (data_without_date >= 0).all().all():
+            self._view.error(
+                "The dataset contains negative values. All values must be positive."
+            )
+            return False
+
+        # If all checks passed
+        self._view.success("Data validation passed successfully.")
+        return True
+
+    def _check_data_out_of_distribution(
+        self, data: pd.DataFrame, threshold: float = 3.0
+    ) -> bool:
+        """
+        Checks if the input data is out of distribution compared to the training data.
+        Displays which features exceed the threshold.
+
+        Args:
+            data (pd.DataFrame): The new input data to validate.
+            threshold (float): The Z-score threshold to determine out of distribution.
+
+        Returns:
+            bool: True if the input data is out of distribution, False otherwise.
+        """
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        grandparent_dir = os.path.dirname(parent_dir)
+        x_train = pd.read_csv(
+            os.path.join(
+                grandparent_dir,
+                "data",
+                "processed/",
+                "v3_lagged_no_missing_predicted_data.csv",
+            )
+        )
+        x_train = x_train.drop(columns=["date"], errors="ignore")
+
+        data_without_date = data.drop(columns=["date"], errors="ignore")
+
+        train_mean = x_train.mean()
+        train_std = x_train.std()
+
+        z_scores = (data_without_date - train_mean) / train_std
+
+        out_of_distribution_flags = z_scores.abs() > threshold
+
+        ood_rows = out_of_distribution_flags.sum(axis=1)
+
+        if ood_rows.any():
+            error_message = f"Input data contains out-of-distribution values. {ood_rows.sum()} {'feature exceeds' if ood_rows.sum() == 1 else 'features exceed'} the z-score threshold.\n\n"
+            error_message += "Out-of-distribution values detected:\n"
+
+            ood_details = z_scores[out_of_distribution_flags]
+            for index, row in ood_details.iterrows():
+                ood_features = row.dropna().index.tolist()
+                ood_values = data_without_date.loc[index, ood_features]
+                error_message += f"- Row {index + 1}: Feature {ood_features} has value {ood_values.tolist()}\n"
+
+            self._view.error(error_message)
+
+            return
+
+        self._view.success("Input data is within the expected distribution.")
