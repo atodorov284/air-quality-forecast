@@ -5,11 +5,12 @@ from datetime import date, datetime, timedelta
 import plotly.graph_objects as go
 import json
 import random
-import sys
 import os
 
 FACTS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "facts.json")
-QUESTIONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "question.json")
+QUESTIONS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "question.json"
+)
 
 
 class UserView:
@@ -38,7 +39,7 @@ class UserView:
     def get_next_three_days_dates(self):
         """
         Returns the next three days' dates in datetime format as a tuple.
-        
+
         :return: tuple of three datetime objects, representing tomorrow, day after tomorrow, and two days after tomorrow.
         """
         today = datetime.now()  # Get the current date and time
@@ -166,7 +167,7 @@ class UserView:
                             "axis": {
                                 "range": [
                                     0,
-                                    2*who_guidelines["WHO Guideline"][0],
+                                    2 * who_guidelines["WHO Guideline"][0],
                                 ]
                             },
                             "bar": {"color": no2_color},
@@ -182,9 +183,7 @@ class UserView:
             # O3 Gauge
             with col2:
                 o3_value = next_three_days["O3 (µg/m³)"][i]
-                o3_color = self.get_color(
-                    o3_value, who_guidelines["WHO Guideline"][1]
-                    )
+                o3_color = self.get_color(o3_value, who_guidelines["WHO Guideline"][1])
                 fig_o3 = go.Figure(
                     go.Indicator(
                         mode="gauge+number",
@@ -194,7 +193,7 @@ class UserView:
                             "axis": {
                                 "range": [
                                     0,
-                                    1.5*who_guidelines["WHO Guideline"][1],
+                                    1.5 * who_guidelines["WHO Guideline"][1],
                                 ]
                             },
                             "bar": {"color": o3_color},
@@ -209,9 +208,7 @@ class UserView:
 
     def view_option_selection(self) -> str:
         st.markdown("### Visualizing Air Quality Predictions")
-        plot_type = st.selectbox(
-            "", ("Line Plot", "Gauge Plot")
-        )
+        plot_type = st.selectbox("", ("Line Plot", "Gauge Plot"))
         return plot_type
 
     def compare_to_who(self, today_data, no2_level, o3_level):
@@ -229,7 +226,7 @@ class UserView:
         st.markdown("### Air Quality Awareness")
 
         # Load facts from the JSON file
-        with open(FACTS_PATH, 'r') as f:
+        with open(FACTS_PATH, "r") as f:
             facts = json.load(f)["facts"]
 
         # Randomly select a fact from the list
@@ -243,7 +240,7 @@ class UserView:
             respiratory problems, aggravate pre-existing conditions like asthma, and contribute to
             cardiovascular diseases.
             """)
-        
+
         with st.expander("⚠️ Why O₃ and NO₂ Matter"):
             st.write("""
             **Ozone (O₃):** Formed by chemical reactions in the atmosphere, particularly on sunny days.
@@ -263,44 +260,59 @@ class UserView:
 
         # Show real-time suggestions for high pollution days
         st.markdown("### Health Recommendations Based on Current Levels")
-        if today_data["NO2 (µg/m³)"] > who_guidelines["WHO Guideline"][0] or today_data["O3 (µg/m³)"] > who_guidelines["WHO Guideline"][1]:
-            st.error("🚨 High pollution levels today. Avoid outdoor activities if possible, especially for vulnerable groups.")
+        if (
+            today_data["NO2 (µg/m³)"] > who_guidelines["WHO Guideline"][0]
+            or today_data["O3 (µg/m³)"] > who_guidelines["WHO Guideline"][1]
+        ):
+            st.error(
+                "🚨 High pollution levels today. Avoid outdoor activities if possible, especially for vulnerable groups."
+            )
         else:
-            st.success("✅ Air quality is within safe limits today. Enjoy your outdoor activities!")
-        
+            st.success(
+                "✅ Air quality is within safe limits today. Enjoy your outdoor activities!"
+            )
+
         self.add_spaces(num_lines=3)
 
     def print_sources(self):
         # Provide user links to external resources or reports
         st.markdown("### Learn More")
-        st.markdown("[WHO Air Quality Guidelines](https://www.who.int/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health)")
-        st.markdown("[Air Pollution Facts](https://www.un.org/sustainabledevelopment/air-pollution/)")
+        st.markdown(
+            "[WHO Air Quality Guidelines](https://www.who.int/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health)"
+        )
+        st.markdown(
+            "[Air Pollution Facts](https://www.un.org/sustainabledevelopment/air-pollution/)"
+        )
 
     def quiz(self):
-        with open(QUESTIONS_PATH, 'r') as f:
+        with open(QUESTIONS_PATH, "r") as f:
             quiz_data = json.load(f)
         # Access the quiz questions
-        questions = quiz_data['quiz']
+        questions = quiz_data["quiz"]
         random_question = random.choice(questions)
 
         # Add a simple quiz to engage the user
         st.markdown("### Quick Quiz: How Much Do You Know About Air Pollution?")
         with st.form(key="quiz_form"):
             # Display the first question and options
-            st.write(random_question['question'])
-            options = random_question['options']
+            st.write(random_question["question"])
+            options = random_question["options"]
             answer = st.radio("Choose an option:", options)
             submitted = st.form_submit_button("Submit Answer")
 
             if submitted:
-                if answer == random_question['answer']:
+                if answer == random_question["answer"]:
                     st.success("Correct!")
                 else:
-                    st.error("Incorrect. The correct answer is: " + random_question['answer'])
+                    st.error(
+                        "Incorrect. The correct answer is: " + random_question["answer"]
+                    )
 
     def raise_awareness_and_quiz(self, today_data, who_guidelines):
         # Create two columns: main column for awareness and right column for the quiz
-        col_main, col_right = st.columns([0.7, 0.3], gap="large")  # 70% for awareness, 30% for quiz
+        col_main, col_right = st.columns(
+            [0.7, 0.3], gap="large"
+        )  # 70% for awareness, 30% for quiz
 
         # Left column: Raise awareness
         with col_main:
@@ -309,7 +321,7 @@ class UserView:
         # Right column: Quiz
         with col_right:
             self.quiz()
-    
+
     def add_spaces(self, num_lines=1):
         """Add vertical space between sections by adding empty lines.
 
