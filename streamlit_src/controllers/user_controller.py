@@ -95,10 +95,10 @@ class UserController:
             The current data in a pandas DataFrame.
         """
         merged_data = {
-            "Pollutant": ["NO2 (µg/m³)", "O3 (µg/m³)"],
-            "Current Concentration": [
-                self._today_data["NO2 (µg/m³)"],
-                self._today_data["O3 (µg/m³)"],
+            "Pollutant": ["NO₂ (µg/m³)", "O₃ (µg/m³)"],
+            "Current": [
+                round(self._today_data["NO2 (µg/m³)"], 2),
+                round(self._today_data["O3 (µg/m³)"], 2),
             ],
             "WHO Guideline": self._who_guidelines["WHO Guideline"],
         }
@@ -124,11 +124,11 @@ class UserController:
         Tuple[str, List[Tuple[str, str]], Dict[str, str]]
             A tuple containing the random fact, awareness expanders, and health message.
         """
-        with open(self._facts_path, "r") as facts_file:
+        with open(self._facts_path, "r", encoding="utf-8") as facts_file:
             facts = json.load(facts_file)
             random_fact = random.choice(facts["facts"])
 
-        with open(self._awareness_path, "r") as awareness_file:
+        with open(self._awareness_path, "r", encoding="utf-8") as awareness_file:
             awareness = json.load(awareness_file)
             awareness_expanders = [
                 (title, "\n".join(text)) for title, text in awareness.items()
@@ -219,8 +219,12 @@ class UserController:
             go.Scatter(
                 x=self._next_three_days["Date"],
                 y=self._next_three_days["NO2 (µg/m³)"],
-                mode="lines+markers+text",
-                name="NO2",
+                mode="lines+markers+text",  # Add 'text' to display the values on the graph
+                name="NO2 (µg/m³)",
+                text=[
+                    f"{v:.2f} µg/m³" for v in self._next_three_days["NO2 (µg/m³)"]
+                ],  # Values displayed at each point
+                textposition="top right",  # Set the position of the text
                 line=dict(color="blue"),
             )
         )
@@ -230,6 +234,10 @@ class UserController:
                 y=self._next_three_days["O3 (µg/m³)"],
                 mode="lines+markers+text",
                 name="O3",
+                text=[
+                    f"{v:.2f} µg/m³" for v in self._next_three_days["O3 (µg/m³)"]
+                ],  # Values displayed at each point
+                textposition="top right",  # Set the position of the text
                 line=dict(color="lightblue"),
             )
         )
