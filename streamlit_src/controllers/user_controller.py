@@ -20,50 +20,50 @@ class UserController:
         """
         Initializes the UserController class.
         """
-        self.model = AirQualityModel()
-        self.view = UserView()
-        self.today_data = self.model.get_today_data()
-        self.next_three_days = self.model.next_three_day_predictions()
+        self._model = AirQualityModel()
+        self._view = UserView()
+        self._today_data = self._model.get_today_data()
+        self._next_three_days = self._model.next_three_day_predictions()
 
-        self.who_guidelines = {
+        self._who_guidelines = {
             "Pollutant": ["NO2 (µg/m³)", "O3 (µg/m³)"],
-            "WHO Guideline": [self.model.WHO_NO2_LEVEL, self.model.WHO_O3_LEVEL],
+            "WHO Guideline": [self._model.WHO_NO2_LEVEL, self._model.WHO_O3_LEVEL],
         }
 
-        # Ensure session state for quiz and quiz answer tracking
+        # Ensure session state for _quiz and _quiz answer tracking
         if "is_first_run" not in st.session_state:
             st.session_state.is_first_run = True
         if "question_choice" not in st.session_state:
             st.session_state.question_choice = np.random.randint(0, 5)
 
         # Paths for external data
-        self.interactions_path = os.path.join(
+        self._interactions_path = os.path.join(
             os.path.dirname(os.path.dirname(__file__)), "json_interactions/"
         )
-        self.facts_path = os.path.join(self.interactions_path, "facts.json")
-        self.questions_path = os.path.join(self.interactions_path, "question.json")
-        self.awareness_path = os.path.join(self.interactions_path, "awareness.json")
+        self._facts_path = os.path.join(self._interactions_path, "facts.json")
+        self._questions_path = os.path.join(self._interactions_path, "question.json")
+        self._awareness_path = os.path.join(self._interactions_path, "awareness.json")
 
     def show_dashboard(self) -> None:
         """
         Shows the main page of the user interface.
         """
-        self.show_current_data()
+        self._show_current_data()
 
-        self.two_columns_layout(0.7, self.raise_awareness, self.quiz)
+        self._two_columns_layout(0.7, self._raise_awareness, self._quiz)
 
         # Plot selection and rendering
-        plot_type = self.view.view_option_selection(["Line Plot", "Gauge Plot"])
+        plot_type = self._view.view_option_selection(["Line Plot", "Gauge Plot"])
         if plot_type == "Line Plot":
-            line_fig = self.prepare_line_plot()
-            self.view.display_predictions_lineplot(line_fig)
+            line_fig = self._prepare_line_plot()
+            self._view.display_predictions_lineplot(line_fig)
         elif plot_type == "Gauge Plot":
-            gauge_plots = self.prepare_gauge_plots()
-            self.view.display_predictions_gaugeplot(gauge_plots)
+            gauge_plots = self._prepare_gauge_plots()
+            self._view.display_predictions_gaugeplot(gauge_plots)
 
         # WHO comparison
-        who_comparisons = self.compare_to_who()
-        self.view.compare_to_who(who_comparisons)
+        who_comparisons = self._compare_to_who()
+        self._view.compare_to_who(who_comparisons)
 
         # Sources
         sources = [
@@ -76,16 +76,16 @@ class UserController:
                 "https://www.un.org/sustainabledevelopment/air-pollution/",
             ),
         ]
-        self.view.print_sources(sources)
+        self._view.print_sources(sources)
 
-    def show_current_data(self) -> None:
+    def _show_current_data(self) -> None:
         """
         Shows the current data on the main page of the user interface.
         """
-        merged_data_df = self.prepare_data_for_view()
-        self.view.show_current_data(merged_data_df)
+        merged_data_df = self._prepare_data_for_view()
+        self._view.show_current_data(merged_data_df)
 
-    def prepare_data_for_view(self) -> pd.DataFrame:
+    def _prepare_data_for_view(self) -> pd.DataFrame:
         """
         Prepares the current data for the view.
 
@@ -97,23 +97,23 @@ class UserController:
         merged_data = {
             "Pollutant": ["NO2 (µg/m³)", "O3 (µg/m³)"],
             "Current Concentration": [
-                self.today_data["NO2 (µg/m³)"],
-                self.today_data["O3 (µg/m³)"],
+                self._today_data["NO2 (µg/m³)"],
+                self._today_data["O3 (µg/m³)"],
             ],
-            "WHO Guideline": self.who_guidelines["WHO Guideline"],
+            "WHO Guideline": self._who_guidelines["WHO Guideline"],
         }
         return pd.DataFrame(merged_data)
 
-    def raise_awareness(self) -> None:
+    def _raise_awareness(self) -> None:
         """
         Shows the awareness content on the main page of the user interface.
         """
         random_fact, awareness_expanders, health_message = (
-            self.prepare_awareness_content()
+            self._prepare_awareness_content()
         )
-        self.view.raise_awareness(random_fact, awareness_expanders, health_message)
+        self._view.raise_awareness(random_fact, awareness_expanders, health_message)
 
-    def prepare_awareness_content(
+    def _prepare_awareness_content(
         self,
     ) -> Tuple[str, List[Tuple[str, str]], Dict[str, str]]:
         """
@@ -124,11 +124,11 @@ class UserController:
         Tuple[str, List[Tuple[str, str]], Dict[str, str]]
             A tuple containing the random fact, awareness expanders, and health message.
         """
-        with open(self.facts_path, "r") as facts_file:
+        with open(self._facts_path, "r") as facts_file:
             facts = json.load(facts_file)
             random_fact = random.choice(facts["facts"])
 
-        with open(self.awareness_path, "r") as awareness_file:
+        with open(self._awareness_path, "r") as awareness_file:
             awareness = json.load(awareness_file)
             awareness_expanders = [
                 (title, "\n".join(text)) for title, text in awareness.items()
@@ -136,8 +136,8 @@ class UserController:
 
         health_message = {"message": "", "type": ""}
         if (
-            self.today_data["NO2 (µg/m³)"] > self.who_guidelines["WHO Guideline"][0]
-            or self.today_data["O3 (µg/m³)"] > self.who_guidelines["WHO Guideline"][1]
+            self._today_data["NO2 (µg/m³)"] > self._who_guidelines["WHO Guideline"][0]
+            or self._today_data["O3 (µg/m³)"] > self._who_guidelines["WHO Guideline"][1]
         ):
             health_message["message"] = (
                 "🚨 High pollution levels today. Avoid outdoor activities if possible, especially for vulnerable groups."
@@ -151,9 +151,9 @@ class UserController:
 
         return random_fact, awareness_expanders, health_message
 
-    def quiz(self) -> None:
+    def _quiz(self) -> None:
         """
-        Show a quiz question and return the answer and whether the answer was correct.
+        Show a _quiz question and return the answer and whether the answer was correct.
 
         Returns
         -------
@@ -161,22 +161,22 @@ class UserController:
             A tuple containing the answer and a boolean indicating whether the answer was correct.
         """
         question_number = st.session_state.question_choice
-        with open(self.questions_path, "r") as questions_file:
+        with open(self._questions_path, "r") as questions_file:
             quiz_data = json.load(questions_file)
             question = quiz_data["quiz"][question_number]["question"]
             options = quiz_data["quiz"][question_number]["options"]
-            submitted, answer = self.view.quiz(question, options)
+            submitted, answer = self._view.quiz(question, options)
 
         if submitted:
             correct_answer = quiz_data["quiz"][question_number]["answer"]
             if answer == correct_answer:
-                self.view.success("Correct answer!")
+                self._view.success("Correct answer!")
             else:
-                self.view.error(
+                self._view.error(
                     f"Wrong answer! The correct answer was {correct_answer[0].lower() + correct_answer[1:]}."
                 )
 
-    def two_columns_layout(
+    def _two_columns_layout(
         self, ratio: float, left_function: Callable, right_function: Callable
     ) -> None:
         """
@@ -199,7 +199,7 @@ class UserController:
         with right:
             right_function()
 
-    def prepare_line_plot(self) -> go.Figure:
+    def _prepare_line_plot(self) -> go.Figure:
         """
         Prepare a line plot for the next three days' NO2 and O3 levels.
 
@@ -207,9 +207,9 @@ class UserController:
             go.Figure: A plotly figure object.
         """
         tomorrow, day_after_tomorrow, two_days_after_tomorrow = (
-            self.get_next_three_days_dates()
+            self._get_next_three_days_dates()
         )
-        self.next_three_days["Date"] = [
+        self._next_three_days["Date"] = [
             tomorrow,
             day_after_tomorrow,
             two_days_after_tomorrow,
@@ -217,8 +217,8 @@ class UserController:
         fig = go.Figure()
         fig.add_trace(
             go.Scatter(
-                x=self.next_three_days["Date"],
-                y=self.next_three_days["NO2 (µg/m³)"],
+                x=self._next_three_days["Date"],
+                y=self._next_three_days["NO2 (µg/m³)"],
                 mode="lines+markers+text",
                 name="NO2",
                 line=dict(color="blue"),
@@ -226,8 +226,8 @@ class UserController:
         )
         fig.add_trace(
             go.Scatter(
-                x=self.next_three_days["Date"],
-                y=self.next_three_days["O3 (µg/m³)"],
+                x=self._next_three_days["Date"],
+                y=self._next_three_days["O3 (µg/m³)"],
                 mode="lines+markers+text",
                 name="O3",
                 line=dict(color="lightblue"),
@@ -236,13 +236,13 @@ class UserController:
 
         # WHO guideline as horizontal dotted lines
         fig.add_hline(
-            y=self.who_guidelines["WHO Guideline"][0],
+            y=self._who_guidelines["WHO Guideline"][0],
             line_dash="dot",
             line_color="blue",
             annotation_text="WHO NO2 Guideline",
         )
         fig.add_hline(
-            y=self.who_guidelines["WHO Guideline"][1],
+            y=self._who_guidelines["WHO Guideline"][1],
             line_dash="dot",
             line_color="lightblue",
             annotation_text="WHO O3 Guideline",
@@ -256,7 +256,7 @@ class UserController:
         )
         return fig
 
-    def get_next_three_days_dates(self) -> tuple:
+    def _get_next_three_days_dates(self) -> tuple:
         """
         Get the next three days' dates.
 
@@ -268,7 +268,7 @@ class UserController:
         two_days_after_tomorrow = date.today() + timedelta(days=3)
         return tomorrow, day_after_tomorrow, two_days_after_tomorrow
 
-    def compare_to_who(self) -> list:
+    def _compare_to_who(self) -> list:
         """
         Compare the current pollutant levels to WHO guidelines.
 
@@ -277,7 +277,7 @@ class UserController:
         """
         comparisons = []
         for i, pollutant in enumerate(["NO2 (µg/m³)", "O3 (µg/m³)"]):
-            if self.today_data[pollutant] > self.who_guidelines["WHO Guideline"][i]:
+            if self._today_data[pollutant] > self._who_guidelines["WHO Guideline"][i]:
                 comparisons.append(
                     (
                         pollutant,
@@ -295,7 +295,7 @@ class UserController:
                 )
         return comparisons
 
-    def prepare_gauge_plots(self) -> list:
+    def _prepare_gauge_plots(self) -> list:
         """
         Prepare gauge plots for the next three days' NO2 and O3 levels.
 
@@ -303,9 +303,9 @@ class UserController:
             list: A list of tuples containing the day index, formatted date, and two plotly figures (for NO2 and O3).
         """
         tomorrow, day_after_tomorrow, two_days_after_tomorrow = (
-            self.get_next_three_days_dates()
+            self._get_next_three_days_dates()
         )
-        self.next_three_days["Date"] = [
+        self._next_three_days["Date"] = [
             tomorrow,
             day_after_tomorrow,
             two_days_after_tomorrow,
@@ -315,18 +315,18 @@ class UserController:
         for i, day in enumerate(
             [tomorrow, day_after_tomorrow, two_days_after_tomorrow]
         ):
-            no2_value = self.next_three_days["NO2 (µg/m³)"][i]
-            o3_value = self.next_three_days["O3 (µg/m³)"][i]
-            fig_no2 = self.create_gauge_plot(
-                no2_value, self.who_guidelines["WHO Guideline"][0], "NO2 (µg/m³)"
+            no2_value = self._next_three_days["NO2 (µg/m³)"][i]
+            o3_value = self._next_three_days["O3 (µg/m³)"][i]
+            fig_no2 = self._create_gauge_plot(
+                no2_value, self._who_guidelines["WHO Guideline"][0], "NO2 (µg/m³)"
             )
-            fig_o3 = self.create_gauge_plot(
-                o3_value, self.who_guidelines["WHO Guideline"][1], "O3 (µg/m³)"
+            fig_o3 = self._create_gauge_plot(
+                o3_value, self._who_guidelines["WHO Guideline"][1], "O3 (µg/m³)"
             )
             gauge_plots.append((i + 1, day.strftime("%B %d, %Y"), fig_no2, fig_o3))
         return gauge_plots
 
-    def create_gauge_plot(
+    def _create_gauge_plot(
         self, value: float, guideline: float, title: str
     ) -> go.Figure:
         """
