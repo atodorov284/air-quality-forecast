@@ -52,20 +52,16 @@ class UserController:
 
         self._two_columns_layout(0.7, self._raise_awareness, self._quiz)
 
-        # Plot selection and rendering
-        plot_type = self._view.view_option_selection(["Line Plot", "Gauge Plot"])
-        if plot_type == "Line Plot":
-            line_fig = self._prepare_line_plot()
-            self._view.display_predictions_lineplot(line_fig)
-        elif plot_type == "Gauge Plot":
-            gauge_plots = self._prepare_gauge_plots()
-            self._view.display_predictions_gaugeplot(gauge_plots)
+        self._display_plots()
 
-        # WHO comparison
-        who_comparisons = self._compare_to_who()
-        self._view.compare_to_who(who_comparisons)
+        self._display_compare_who()
 
-        # Sources
+        self._display_sources()
+
+    def _display_sources(self) -> None:
+        """
+        Displays the sources on the main page of the user interface.
+        """
         sources = [
             (
                 "WHO Air Quality Guidelines",
@@ -77,6 +73,26 @@ class UserController:
             ),
         ]
         self._view.print_sources(sources)
+
+    def _display_compare_who(self) -> None:
+        """
+        Displays the WHO comparison on the main page of the user interface.
+        """
+        who_comparisons = self._compare_to_who()
+        self._view.compare_to_who(who_comparisons)
+
+    def _display_plots(self) -> None:
+        """
+        Displays the plots on the main page of the user interface.
+        """
+        plot_type = self._view.view_option_selection(["Line Plot", "Gauge Plot"])
+
+        if plot_type == "Line Plot":
+            line_fig = self._prepare_line_plot()
+            self._view.display_predictions_lineplot(line_fig)
+        elif plot_type == "Gauge Plot":
+            gauge_plots = self._prepare_gauge_plots()
+            self._view.display_predictions_gaugeplot(gauge_plots)
 
     def _show_current_data(self) -> None:
         """
