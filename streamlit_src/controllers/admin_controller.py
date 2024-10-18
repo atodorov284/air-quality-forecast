@@ -7,7 +7,7 @@ from air_quality_forecast.prediction import PredictorModels
 
 class AdminController(UserController):
     """
-    A class to handle the admin interface.
+    A class to handle the admin interface. Inherits from UserController
     """
 
     def __init__(self) -> None:
