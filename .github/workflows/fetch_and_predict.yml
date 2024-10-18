@@ -9,6 +9,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write # Grant permission to write to the repository
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -37,8 +40,8 @@ jobs:
 
       - name: Commit and push prediction CSV to repository
         run: |
-          git config --local user.email "you@example.com"  # Replace with your email
-          git config --local user.name "Your Name"          # Replace with your name
+          git config --local user.email "atodorov284@gmail.com"  # Replace with your email
+          git config --local user.name "Alex"          # Replace with your name
           git add data/inference/current_prediction_data.csv
           git commit -m "Update prediction data" || echo "No changes to commit"
           git push origin deploy
