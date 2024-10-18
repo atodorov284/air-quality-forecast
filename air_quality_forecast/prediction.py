@@ -69,9 +69,6 @@ class PredictorModels:
         if x_test.ndim != 2:
             raise ValueError("x_test must be 2 dimensional, got {}".format(x_test.ndim))
         xgb_test = xgboost.DMatrix(x_test)
-        print(x_test)
-        print(xgb_test)
-        print(self._xgboost.get_booster().feature_names)
         y_pred = self._xgboost.predict(xgb_test)
         return y_pred
 
