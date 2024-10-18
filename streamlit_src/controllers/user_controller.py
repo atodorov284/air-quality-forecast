@@ -20,6 +20,7 @@ class UserController:
 
         # Display current data and predictions
         self.view.show_current_data(today_data, who_guidelines)
+        self.view.raise_awareness_and_quiz(today_data, who_guidelines)
         plot_type = self.view.view_option_selection()
         if plot_type == "Line Plot":
             self.view.display_predictions_lineplot(next_three_days, who_guidelines)
@@ -30,3 +31,6 @@ class UserController:
         self.view.compare_to_who(
             today_data, self.model.WHO_NO2_LEVEL, self.model.WHO_O3_LEVEL
         )
+
+        # Print sources
+        self.view.print_sources()

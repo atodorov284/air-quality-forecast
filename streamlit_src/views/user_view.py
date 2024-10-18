@@ -3,6 +3,13 @@ import streamlit as st
 import pandas as pd
 from datetime import date, datetime, timedelta
 import plotly.graph_objects as go
+import json
+import random
+import sys
+import os
+
+FACTS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "facts.json")
+QUESTIONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "question.json")
 
 
 class UserView:
@@ -29,6 +36,11 @@ class UserView:
         st.sidebar.dataframe(merged_data_df, hide_index=True)
 
     def get_next_three_days_dates(self):
+        """
+        Returns the next three days' dates in datetime format as a tuple.
+        
+        :return: tuple of three datetime objects, representing tomorrow, day after tomorrow, and two days after tomorrow.
+        """
         today = datetime.now()  # Get the current date and time
         tomorrow = today + timedelta(days=1)
         day_after_tomorrow = today + timedelta(days=2)
@@ -36,8 +48,6 @@ class UserView:
         return tomorrow, day_after_tomorrow, two_days_after_tomorrow
 
     def display_predictions_lineplot(self, next_three_days, who_guidelines):
-        st.markdown("### Predictions for the Next 3 Days")
-
         tomorrow, day_after_tomorrow, two_days_after_tomorrow = (
             self.get_next_three_days_dates()
         )
@@ -105,15 +115,19 @@ class UserView:
         # Display the plot in Streamlit
         st.plotly_chart(fig)
 
-    def get_no2_color(self, value, who_limit):
-        # Define the gradient points
-        if value <= who_limit:
-            # Blue -> Purple gradient
-            return f"rgba({int(0 + (255 * value / who_limit))}, 0, 255, 1)"  # Gradient from blue to purple
+    def get_color(self, value, who_limit):
+        half_who_limit = who_limit / 2
+
+        if value <= half_who_limit:
+            # Green -> Yellow gradient
+            return f"rgba({int(255 * value / half_who_limit)}, 255, 0, 1)"  # Gradient from green to yellow
+        elif value <= who_limit:
+            # Yellow -> Red gradient
+            excess_value = value - half_who_limit
+            return f"rgba(255, {int(255 - (255 * excess_value / half_who_limit))}, 0, 1)"  # Gradient from yellow to red
         else:
-            # Purple -> Red gradient
-            excess_value = min(who_limit, value - who_limit)
-            return f"rgba(255, 0, {int(255 - (255 * excess_value / who_limit))}, 1)"  # Gradient from purple to red
+            # Beyond the WHO limit, fully red
+            return "rgba(255, 0, 0, 1)"  # Fully red
 
     def display_predictions_gaugeplot(self, next_three_days, who_guidelines):
         st.markdown("### Predictions for the Next 3 Days")
@@ -140,7 +154,7 @@ class UserView:
             with col1:
                 # Get color based on NO2 value
                 no2_value = next_three_days["NO2 (µg/m³)"][i]
-                no2_color = self.get_no2_color(
+                no2_color = self.get_color(
                     no2_value, who_guidelines["WHO Guideline"][0]
                 )
                 fig_no2 = go.Figure(
@@ -152,7 +166,7 @@ class UserView:
                             "axis": {
                                 "range": [
                                     0,
-                                    max(who_guidelines["WHO Guideline"][0], 100),
+                                    2*who_guidelines["WHO Guideline"][0],
                                 ]
                             },
                             "bar": {"color": no2_color},
@@ -167,6 +181,10 @@ class UserView:
 
             # O3 Gauge
             with col2:
+                o3_value = next_three_days["O3 (µg/m³)"][i]
+                o3_color = self.get_color(
+                    o3_value, who_guidelines["WHO Guideline"][1]
+                    )
                 fig_o3 = go.Figure(
                     go.Indicator(
                         mode="gauge+number",
@@ -176,10 +194,10 @@ class UserView:
                             "axis": {
                                 "range": [
                                     0,
-                                    max(who_guidelines["WHO Guideline"][1], 150),
+                                    1.5*who_guidelines["WHO Guideline"][1],
                                 ]
                             },
-                            "bar": {"color": "lightblue"},
+                            "bar": {"color": o3_color},
                         },
                         domain={"x": [0, 1], "y": [0, 1]},  # Controls size
                     )
@@ -190,8 +208,9 @@ class UserView:
                 st.plotly_chart(fig_o3)
 
     def view_option_selection(self) -> str:
+        st.markdown("### Visualizing Air Quality Predictions")
         plot_type = st.selectbox(
-            "Choose Visualization Type", ("Line Plot", "Gauge Plot")
+            "", ("Line Plot", "Gauge Plot")
         )
         return plot_type
 
@@ -206,18 +225,96 @@ class UserView:
         else:
             st.sidebar.success("✅ O3 levels are within safe limits.")
 
-    def raise_awareness(self):
-        st.sidebar.markdown("""
-        **Air pollution** is a serious concern that affects the environment and public health.
-        High levels of pollutants, such as ozone (O₃) and nitrogen dioxide (NO₂), can lead to
-        respiratory problems, aggravate pre-existing conditions like asthma, and contribute to
-        cardiovascular diseases. On particularly bad days, vulnerable groups such as children,
-        the elderly, and those with respiratory issues are at even greater risk.
-        """)
+    def raise_awareness(self, today_data, who_guidelines):
+        st.markdown("### Air Quality Awareness")
 
-        st.sidebar.markdown("""
-        **Key Pollutants:**
-        - **Ozone (O₃):** Formed by chemical reactions in the atmosphere, particularly on sunny days.
-        - **Nitrogen Dioxide (NO₂):** Mostly emitted from vehicles and industrial activities, this can cause
-        irritation of the respiratory system.
-        """)
+        # Load facts from the JSON file
+        with open(FACTS_PATH, 'r') as f:
+            facts = json.load(f)["facts"]
+
+        # Randomly select a fact from the list
+        random_fact = random.choice(facts)
+
+        # Create expandable sections for key pollutant information
+        with st.expander("🌍 What is Air Pollution?"):
+            st.write("""
+            **Air pollution** is a serious concern that affects the environment and public health.
+            High levels of pollutants, such as ozone (O₃) and nitrogen dioxide (NO₂), can lead to
+            respiratory problems, aggravate pre-existing conditions like asthma, and contribute to
+            cardiovascular diseases.
+            """)
+        
+        with st.expander("⚠️ Why O₃ and NO₂ Matter"):
+            st.write("""
+            **Ozone (O₃):** Formed by chemical reactions in the atmosphere, particularly on sunny days.
+            High levels can cause chest pain, coughing, throat irritation, and airway inflammation.
+            
+            **Nitrogen Dioxide (NO₂):** Mostly emitted from vehicles and industrial activities, this can cause
+            irritation of the respiratory system and decrease lung function, especially during long-term exposure.
+            """)
+
+        self.add_spaces(num_lines=3)
+
+        # Display the random fact for user awareness
+        st.markdown("### Did You Know?")
+        st.info(random_fact)  # Display the random fact in an info box
+
+        self.add_spaces(num_lines=3)
+
+        # Show real-time suggestions for high pollution days
+        st.markdown("### Health Recommendations Based on Current Levels")
+        if today_data["NO2 (µg/m³)"] > who_guidelines["WHO Guideline"][0] or today_data["O3 (µg/m³)"] > who_guidelines["WHO Guideline"][1]:
+            st.error("🚨 High pollution levels today. Avoid outdoor activities if possible, especially for vulnerable groups.")
+        else:
+            st.success("✅ Air quality is within safe limits today. Enjoy your outdoor activities!")
+        
+        self.add_spaces(num_lines=3)
+
+    def print_sources(self):
+        # Provide user links to external resources or reports
+        st.markdown("### Learn More")
+        st.markdown("[WHO Air Quality Guidelines](https://www.who.int/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health)")
+        st.markdown("[Air Pollution Facts](https://www.un.org/sustainabledevelopment/air-pollution/)")
+
+    def quiz(self):
+        with open(QUESTIONS_PATH, 'r') as f:
+            quiz_data = json.load(f)
+        # Access the quiz questions
+        questions = quiz_data['quiz']
+        random_question = random.choice(questions)
+
+        # Add a simple quiz to engage the user
+        st.markdown("### Quick Quiz: How Much Do You Know About Air Pollution?")
+        with st.form(key="quiz_form"):
+            # Display the first question and options
+            st.write(random_question['question'])
+            options = random_question['options']
+            answer = st.radio("Choose an option:", options)
+            submitted = st.form_submit_button("Submit Answer")
+
+            if submitted:
+                if answer == random_question['answer']:
+                    st.success("Correct!")
+                else:
+                    st.error("Incorrect. The correct answer is: " + random_question['answer'])
+
+    def raise_awareness_and_quiz(self, today_data, who_guidelines):
+        # Create two columns: main column for awareness and right column for the quiz
+        col_main, col_right = st.columns([0.7, 0.3], gap="large")  # 70% for awareness, 30% for quiz
+
+        # Left column: Raise awareness
+        with col_main:
+            self.raise_awareness(today_data, who_guidelines)
+
+        # Right column: Quiz
+        with col_right:
+            self.quiz()
+    
+    def add_spaces(self, num_lines=1):
+        """Add vertical space between sections by adding empty lines.
+
+        Args:
+            num_lines (int): Number of blank lines to add. Default is 1.
+        """
+        for _ in range(num_lines):
+            st.write("")  # This adds a blank line to create space
