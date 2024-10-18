@@ -38,8 +38,9 @@ class UserView:
     def display_predictions_lineplot(self, next_three_days, who_guidelines):
         st.markdown("### Predictions for the Next 3 Days")
 
-        tomorrow, day_after_tomorrow, two_days_after_tomorrow = \
+        tomorrow, day_after_tomorrow, two_days_after_tomorrow = (
             self.get_next_three_days_dates()
+        )
 
         # Update the dataframe with actual dates in datetime format
         next_three_days["Date"] = [
@@ -117,8 +118,9 @@ class UserView:
     def display_predictions_gaugeplot(self, next_three_days, who_guidelines):
         st.markdown("### Predictions for the Next 3 Days")
         # Convert date to datetime and calculate future dates
-        tomorrow, day_after_tomorrow, two_days_after_tomorrow = \
+        tomorrow, day_after_tomorrow, two_days_after_tomorrow = (
             self.get_next_three_days_dates()
+        )
 
         # Update the dataframe with actual dates in datetime format
         next_three_days["Date"] = [
@@ -138,7 +140,9 @@ class UserView:
             with col1:
                 # Get color based on NO2 value
                 no2_value = next_three_days["NO2 (µg/m³)"][i]
-                no2_color = self.get_no2_color(no2_value, who_guidelines["WHO Guideline"][0])
+                no2_color = self.get_no2_color(
+                    no2_value, who_guidelines["WHO Guideline"][0]
+                )
                 fig_no2 = go.Figure(
                     go.Indicator(
                         mode="gauge+number",
@@ -187,8 +191,7 @@ class UserView:
 
     def view_option_selection(self) -> str:
         plot_type = st.selectbox(
-            "Choose Visualization Type",
-            ("Line Plot", "Gauge Plot")
+            "Choose Visualization Type", ("Line Plot", "Gauge Plot")
         )
         return plot_type
 
@@ -205,16 +208,16 @@ class UserView:
 
     def raise_awareness(self):
         st.sidebar.markdown("""
-        **Air pollution** is a serious concern that affects the environment and public health. 
-        High levels of pollutants, such as ozone (O₃) and nitrogen dioxide (NO₂), can lead to 
-        respiratory problems, aggravate pre-existing conditions like asthma, and contribute to 
-        cardiovascular diseases. On particularly bad days, vulnerable groups such as children, 
-        the elderly, and those with respiratory issues are at even greater risk. 
+        **Air pollution** is a serious concern that affects the environment and public health.
+        High levels of pollutants, such as ozone (O₃) and nitrogen dioxide (NO₂), can lead to
+        respiratory problems, aggravate pre-existing conditions like asthma, and contribute to
+        cardiovascular diseases. On particularly bad days, vulnerable groups such as children,
+        the elderly, and those with respiratory issues are at even greater risk.
         """)
 
         st.sidebar.markdown("""
         **Key Pollutants:**
         - **Ozone (O₃):** Formed by chemical reactions in the atmosphere, particularly on sunny days.
-        - **Nitrogen Dioxide (NO₂):** Mostly emitted from vehicles and industrial activities, this can cause 
+        - **Nitrogen Dioxide (NO₂):** Mostly emitted from vehicles and industrial activities, this can cause
         irritation of the respiratory system.
         """)
