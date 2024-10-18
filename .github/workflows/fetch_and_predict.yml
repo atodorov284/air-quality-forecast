@@ -40,3 +40,4 @@ jobs:
         with:
           name: current-prediction-data
           path: data/inference/current_prediction_data.csv
+          if-no-file: overwrite
