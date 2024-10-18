@@ -12,7 +12,7 @@ class AdminController:
         # Fetch today's data and the next three days' predictions from the model
         today_data = self.model.get_today_data()
         next_three_days = self.model.next_three_day_predictions()
-        #model_metrics = self.model.get_model_metrics()
+        # model_metrics = self.model.get_model_metrics()
 
         # Define WHO guidelines for pollutant levels
         who_guidelines = {
@@ -35,7 +35,7 @@ class AdminController:
         # Right column content for additional details or actions
         with col_right:
             st.markdown("### Model Performance")
-            #self.view.show_model_performance(model_metrics)
+            # self.view.show_model_performance(model_metrics)
 
     def welcome_back(self):
         self.view.welcome_back()
