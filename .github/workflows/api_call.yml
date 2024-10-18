@@ -1,4 +1,4 @@
-name: Python application
+name: API Call
 
 on:
   push:
@@ -26,5 +26,4 @@ jobs:
         run: |
           python air_quality_forecast/api_caller.py
         env:
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           VC_API_KEY: ${{ secrets.VC_API_KEY }}

@@ -18,6 +18,7 @@ class APICaller:
         self._vc_base_url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/weatherdata/history"
         # probably need to hide this lol (it's Lukasz' key but its public anyway)
         self._vc_key = os.getenv("VC_API_KEY")
+        print(self._vc_key)
         self._vc_max_wait = 10
         self._successful_request_code = 200
 
