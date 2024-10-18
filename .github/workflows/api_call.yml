@@ -22,12 +22,6 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Print API Key
-        run: |
-          echo "API Key: $VC_KEY"
-        env:
-          VC_KEY: ${{ secrets.VC_KEY }}
-
       - name: Run Python script
         env:
           VC_KEY: ${{ secrets.VC_KEY }}
