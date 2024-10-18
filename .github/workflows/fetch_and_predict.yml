@@ -1,9 +1,9 @@
-name: API Call
+name: Fetch and Predict
 
 on:
   push:
     branches:
-      - api
+      - deploy
 
 jobs:
   build:
@@ -26,4 +26,4 @@ jobs:
         env:
           VC_KEY: ${{ secrets.VC_KEY }}
         run: |
-          python air_quality_forecast/api_caller.py
+          python air_quality_forecast/get_prediction_data.py

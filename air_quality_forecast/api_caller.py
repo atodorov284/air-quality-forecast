@@ -16,9 +16,10 @@ class APICaller:
         self._components_griftpark = "O3,NO2,PM25"
         self._components_erzeijstraat = "PM10"
         self._vc_base_url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/weatherdata/history"
-        # probably need to hide this lol (it's Lukasz' key but its public anyway)
         self._vc_key = os.environ.get("VC_KEY")
-        self._vc_max_wait = 10
+        if not self._vc_key:
+            self._vc_key = "3LBMJ7SAH5BCSL5H2DYS5YQ5K"
+        self._vc_max_wait = 30
         self._successful_request_code = 200
 
     def _current_time(self) -> str:
@@ -149,9 +150,6 @@ class APICaller:
         """
         air_data = self.get_luchtmeet_data()
         weather_data = self.get_vc_data()
-
-        print(air_data)
-        print(weather_data)
 
         df = pd.merge(air_data, weather_data, on="date")
 
