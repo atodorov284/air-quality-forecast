@@ -1,3 +1,4 @@
+from typing import Callable
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -89,6 +90,29 @@ class UserView:
                 st.sidebar.error(message)
             elif level == "success":
                 st.sidebar.success(message)
+
+    def two_columns_layout(
+        self, ratio: float, left_function: Callable, right_function: Callable
+    ) -> None:
+        """
+        Divide the page into two columns and call the left and right functions within them.
+
+        Parameters
+        ----------
+        ratio : float
+            The ratio of the left to the right column.
+        left_function : Callable
+            The function to be called in the left column.
+        right_function : Callable
+            The function to be called in the right column.
+        """
+        left, right = st.columns([ratio, 1 - ratio], gap="large")
+
+        with left:
+            left_function()
+
+        with right:
+            right_function()
 
     def raise_awareness(
         self, random_fact: str, awareness_expanders: list, health_message: dict

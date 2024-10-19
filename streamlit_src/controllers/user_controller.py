@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List, Tuple
+from typing import Dict, List, Tuple
 import streamlit as st
 import numpy as np
 from models.air_quality_model import AirQualityModel
@@ -50,7 +50,7 @@ class UserController:
         """
         self._show_current_data()
 
-        self._two_columns_layout(0.7, self._raise_awareness, self._quiz)
+        self._view.two_columns_layout(0.7, self._raise_awareness, self._quiz)
 
         self._display_plots()
 
@@ -191,29 +191,6 @@ class UserController:
                 self._view.error(
                     f"Wrong answer! The correct answer was {correct_answer[0].lower() + correct_answer[1:]}."
                 )
-
-    def _two_columns_layout(
-        self, ratio: float, left_function: Callable, right_function: Callable
-    ) -> None:
-        """
-        Divide the page into two columns and call the left and right functions within them.
-
-        Parameters
-        ----------
-        ratio : float
-            The ratio of the left to the right column.
-        left_function : Callable
-            The function to be called in the left column.
-        right_function : Callable
-            The function to be called in the right column.
-        """
-        left, right = st.columns([ratio, 1 - ratio], gap="large")
-
-        with left:
-            left_function()
-
-        with right:
-            right_function()
 
     def _prepare_line_plot(self) -> go.Figure:
         """
@@ -370,7 +347,7 @@ class UserController:
                 mode="gauge+number",
                 value=value,
                 title={"text": title},
-                gauge={"axis": {"range": [0, 2 * guideline]}, "bar": {"color": color}},
+                gauge={"axis": {"range": [0, guideline]}, "bar": {"color": color}},
             )
         )
         fig.update_layout(height=250, width=250, margin=dict(t=0, b=0, l=0, r=0))
@@ -387,15 +364,16 @@ class UserController:
         Returns:
             str: A hex color code representing the calculated color.
         """
+
         half_who_limit = who_limit / 2
 
         if value <= half_who_limit:
-            # Green -> Yellow gradient
-            return f"rgba({int(255 * value / half_who_limit)}, 255, 0, 1)"  # Gradient from green to yellow
+            # Green to Bright Yellow (exaggerated contrast)
+            return f"rgba(0, {int(255 * value / half_who_limit)}, 0, 1)"  # Gradient from dark green to bright green
         elif value <= who_limit:
-            # Yellow -> Red gradient
+            # Yellow to Dark Orange (stronger contrast between safe and danger)
             excess_value = value - half_who_limit
-            return f"rgba(255, {int(255 - (255 * excess_value / half_who_limit))}, 0, 1)"  # Gradient from yellow to red
+            return f"rgba(255, {int(200 - (200 * excess_value / half_who_limit))}, 0, 1)"  # Gradient from bright yellow to dark orange
         else:
-            # Beyond the WHO limit, fully red
-            return "rgba(255, 0, 0, 1)"  # Fully red
+            # Dark Red for exceeding WHO limit
+            return "rgba(180, 0, 0, 1)"  # Dark red for dangerous levels
