@@ -44,6 +44,7 @@ jobs:
         run: |
           git config --local user.email "atodorov284@gmail.com"
           git config --local user.name "Alex"
+          git pull
           git add data/model_predictions/prediction_data.csv
           git add data/model_predictions/last_three_days.csv
           git commit -m "Update prediction data" || echo "No changes to commit"
