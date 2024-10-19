@@ -2,7 +2,7 @@ name: Fetch, Predict, and Sync to Hugging Face Hub
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "1 4/6 * * *" # Runs every 6 hours 1 minute past the hour, starting at 06:00 GMT+2 (Netherlands), runs at 06:01, 12:01, 18:01, 00:01
   push:
     branches:
       - deploy
@@ -44,7 +44,7 @@ jobs:
       - name: Commit and push prediction CSV to repository
         run: |
           git config --local user.email "atodorov284@gmail.com"
-          git config --local user.name "Alex"
+          git config --local user.name "WorkflowBotAlex"
           git pull
           git add data/model_predictions/prediction_data.csv
           git add data/model_predictions/last_three_days.csv
