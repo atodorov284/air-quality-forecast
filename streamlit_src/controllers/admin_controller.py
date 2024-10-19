@@ -1,4 +1,5 @@
 import os
+from typing import Tuple
 from views.admin_view import AdminView
 import streamlit as st
 from controllers.user_controller import UserController
@@ -17,6 +18,9 @@ class AdminController(UserController):
         """
         super().__init__()
         self._view = AdminView()
+        self._distribution_means, self._distribution_stds = (
+            self._compute_distribution_statistics()
+        )
 
     def show_dashboard(self) -> None:
         """
@@ -37,6 +41,57 @@ class AdminController(UserController):
         Computes the metrics for the admin interface.
         """
         pass
+
+    def _compute_distribution_statistics(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """
+        Computes the means and standard deviations of the features in the dataset.
+
+        Returns:
+            A tuple of two DataFrames. The first DataFrame contains the means of the features
+                and the second DataFrame contains the standard deviations of the features.
+        """
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        grandparent_dir = os.path.dirname(parent_dir)
+        distribution_data = pd.read_csv(
+            os.path.join(
+                grandparent_dir,
+                "data",
+                "processed/",
+                "v2_merged_selected_features_with_missing.csv",
+            ),
+            index_col=0,
+        )
+
+        distribution_means = (
+            distribution_data.mean().reset_index(drop=False).transpose()
+        )
+        distribution_means.columns = distribution_means.iloc[0]
+        distribution_means = distribution_means[1:]
+
+        distribution_stds = distribution_data.std().reset_index(drop=False).transpose()
+        distribution_stds.columns = distribution_stds.iloc[0]
+        distribution_stds = distribution_stds[1:]
+
+        formatted_means = pd.concat(
+            [
+                distribution_means.add_suffix(" - day 0"),
+                distribution_means.add_suffix(" - day 1"),
+                distribution_means.add_suffix(" - day 2"),
+            ],
+            axis=1,
+        )
+
+        formatted_stds = pd.concat(
+            [
+                distribution_stds.add_suffix(" - day 0"),
+                distribution_stds.add_suffix(" - day 1"),
+                distribution_stds.add_suffix(" - day 2"),
+            ],
+            axis=1,
+        )
+
+        return formatted_means, formatted_stds
 
     def _make_custom_predictions(self) -> None:
         """
@@ -178,54 +233,11 @@ class AdminController(UserController):
         Returns:
             bool: True if the input data is out of distribution, False otherwise.
         """
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        parent_dir = os.path.dirname(current_dir)
-        grandparent_dir = os.path.dirname(parent_dir)
-        distribution_data = pd.read_csv(
-            os.path.join(
-                grandparent_dir,
-                "data",
-                "processed/",
-                "v2_merged_selected_features_with_missing.csv",
-            ),
-            index_col=0,
-        )
-
         input_data.drop("date", axis=1, inplace=True)
 
-        distribution_means = (
-            distribution_data.mean().reset_index(drop=False).transpose()
-        )
-        distribution_means.columns = distribution_means.iloc[0]
-        distribution_means = distribution_means[1:]
-
-        distribution_stds = distribution_data.std().reset_index(drop=False).transpose()
-        distribution_stds.columns = distribution_stds.iloc[0]
-        distribution_stds = distribution_stds[1:]
-
-        formatted_means = pd.concat(
-            [
-                distribution_means.add_suffix(" - day 0"),
-                distribution_means.add_suffix(" - day 1"),
-                distribution_means.add_suffix(" - day 2"),
-            ],
-            axis=1,
-        )
-
-        formatted_stds = pd.concat(
-            [
-                distribution_stds.add_suffix(" - day 0"),
-                distribution_stds.add_suffix(" - day 1"),
-                distribution_stds.add_suffix(" - day 2"),
-            ],
-            axis=1,
-        )
-
         z_scores = (
-            input_data - formatted_means.values.squeeze()
-        ) / formatted_stds.values.squeeze()
-
-        self._view.display_datatable(z_scores, "")
+            input_data - self._distribution_means.values.squeeze()
+        ) / self._distribution_stds.values.squeeze()
 
         out_of_distribution_flags = z_scores.abs() > threshold
 
