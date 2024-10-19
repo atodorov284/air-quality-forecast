@@ -3,6 +3,7 @@ from typing import Dict
 import streamlit as st
 from views.user_view import UserView
 import pandas as pd
+import plotly.express as px
 
 
 class AdminView(UserView):
@@ -16,6 +17,53 @@ class AdminView(UserView):
         Initializes the AdminView class.
         """
         super().__init__()
+
+    def show_admin_pages(self):
+        page = st.selectbox(
+            "Select a page:",
+            [
+                "Display Predictions",
+                "Make Predictions",
+                "Feature Importances",
+                "Model Metrics",
+            ],
+        )
+        return page
+
+    def display_feature_importance(
+        self, features: list, importance_values: list
+    ) -> None:
+        """
+        Displays the feature importance graph using Plotly for better aesthetics.
+
+        :param features: A list of feature names.
+        :param importance_values: A list of corresponding importance values.
+        """
+        # Creating a DataFrame for better visualization with Plotly
+        feature_importance_df = pd.DataFrame(
+            {"Feature": features, "Importance": importance_values}
+        )
+
+        feature_importance_df.sort_values(by="Importance", ascending=True, inplace=True)
+
+        fig = px.bar(
+            feature_importance_df,
+            x="Importance",
+            y="Feature",
+            orientation="h",
+            title="Feature Importance for Predictor Variables",
+            labels={
+                "Importance": "Mean Absolute SHAP",
+                "Feature": "Predictor Variables",
+            },
+            color="Importance",
+            color_continuous_scale="Cividis",
+        )
+
+        fig.update_layout(height=600)
+        fig.update_layout(width=1500)
+
+        st.plotly_chart(fig, use_container_width=True)
 
     def welcome_back(self) -> None:
         """

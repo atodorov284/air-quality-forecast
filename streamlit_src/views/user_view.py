@@ -76,7 +76,7 @@ class UserView:
             str: The selected option.
         """
         st.markdown("### Visualizing Air Quality Predictions")
-        return st.selectbox("", plot_type)
+        return st.selectbox("Select a plot type:", plot_type)
 
     def compare_to_who(self, warnings: list) -> None:
         """

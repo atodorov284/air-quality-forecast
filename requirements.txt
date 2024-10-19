@@ -1,10 +1,11 @@
+joblib
+matplotlib
 mlflow==2.16.2
 numpy==1.26.2
+pandas==2.2.2
+plotly
+pre-commit
 scikit-learn==1.5.2
 scikit-optimize==0.10.2
-pandas==2.2.2
-xgboost==2.1.1
-joblib
 streamlit
-pre-commit
-plotly
+xgboost==2.1.1
