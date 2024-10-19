@@ -22,7 +22,6 @@ class AdminController(UserController):
         """
         Shows the main page of the admin interface.
         """
-        st.markdown("ADMIN DASHBOARD")
         self._show_current_data()
         self._display_plots()
         self._make_custom_predictions()
@@ -166,7 +165,7 @@ class AdminController(UserController):
         return True
 
     def _check_data_out_of_distribution(
-        self, data: pd.DataFrame, threshold: float = 3.0
+        self, input_data: pd.DataFrame, threshold: float = 3
     ) -> bool:
         """
         Checks if the input data is out of distribution compared to the training data.
@@ -182,36 +181,67 @@ class AdminController(UserController):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         grandparent_dir = os.path.dirname(parent_dir)
-        x_train = pd.read_csv(
+        distribution_data = pd.read_csv(
             os.path.join(
                 grandparent_dir,
                 "data",
                 "processed/",
-                "v3_lagged_no_missing_predicted_data.csv",
-            )
+                "v2_merged_selected_features_with_missing.csv",
+            ),
+            index_col=0,
         )
-        x_train = x_train.drop(columns=["date"], errors="ignore")
 
-        data_without_date = data.drop(columns=["date"], errors="ignore")
+        input_data.drop("date", axis=1, inplace=True)
 
-        train_mean = x_train.mean()
-        train_std = x_train.std()
+        distribution_means = (
+            distribution_data.mean().reset_index(drop=False).transpose()
+        )
+        distribution_means.columns = distribution_means.iloc[0]
+        distribution_means = distribution_means[1:]
 
-        z_scores = (data_without_date - train_mean) / train_std
+        distribution_stds = distribution_data.std().reset_index(drop=False).transpose()
+        distribution_stds.columns = distribution_stds.iloc[0]
+        distribution_stds = distribution_stds[1:]
+
+        formatted_means = pd.concat(
+            [
+                distribution_means.add_suffix(" - day 0"),
+                distribution_means.add_suffix(" - day 1"),
+                distribution_means.add_suffix(" - day 2"),
+            ],
+            axis=1,
+        )
+
+        formatted_stds = pd.concat(
+            [
+                distribution_stds.add_suffix(" - day 0"),
+                distribution_stds.add_suffix(" - day 1"),
+                distribution_stds.add_suffix(" - day 2"),
+            ],
+            axis=1,
+        )
+
+        z_scores = (
+            input_data - formatted_means.values.squeeze()
+        ) / formatted_stds.values.squeeze()
+
+        self._view.display_datatable(z_scores, "")
 
         out_of_distribution_flags = z_scores.abs() > threshold
 
         ood_rows = out_of_distribution_flags.sum(axis=1)
 
         if ood_rows.any():
-            error_message = f"Input data contains out-of-distribution values. {ood_rows.sum()} {'feature exceeds' if ood_rows.sum() == 1 else 'features exceed'} the z-score threshold. Model prediction might be innacurate\n\n"
-            error_message += "Out-of-distribution values detected:\n"
+            error_message = f"Input data might contain out-of-distribution values. {ood_rows.sum()} {'feature exceeds' if ood_rows.sum() == 1 else 'features exceed'} exceed the z-score threshold. Model prediction might be inaccurate.\n\n"
 
             ood_details = z_scores[out_of_distribution_flags]
             for index, row in ood_details.iterrows():
                 ood_features = row.dropna().index.tolist()
-                ood_values = data_without_date.loc[index, ood_features]
-                error_message += f"- Row {index + 1}: Feature {ood_features} has value {ood_values.tolist()}\n"
+                ood_values = input_data.loc[index, ood_features]
+
+                # Loop through each feature individually for better readability
+                for feature, value in zip(ood_features, ood_values):
+                    error_message += f"Row {index + 1}: The feature '{feature}' has a value of {value:.2f}.\n\n"
 
             self._view.error(error_message)
 
