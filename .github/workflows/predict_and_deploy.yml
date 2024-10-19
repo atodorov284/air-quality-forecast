@@ -2,7 +2,7 @@ name: Fetch, Predict, and Sync to Hugging Face Hub
 
 on:
   schedule:
-    - cron: "1 0/6 * * *" # Runs every 6 hours 1 minute past the hour, starting at 02:00 GMT+2 (Netherlands), runs at 02:01, 08:01, 14:01, 20:01
+    - cron: "15 2/6 * * *" # Runs every 6 hours 1 minute past the hour, starting at 04:00 GMT+2 (Netherlands), runs at 04:15, 10:15, 16:15, 22:15
   push:
     branches:
       - deploy
