@@ -30,8 +30,11 @@ class AdminController(UserController):
         switch = self._view.show_admin_pages()
 
         if switch == "Display Predictions":
-            self._show_current_data()
-            self._display_plots()
+            if not self._is_current_data_available():
+                self._view.data_not_available()
+            else:
+                self._show_current_data()
+                self._display_plots()
 
         elif switch == "Make Predictions":
             self._make_custom_predictions()

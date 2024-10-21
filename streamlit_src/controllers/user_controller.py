@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import random
 import json
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import plotly.graph_objects as go
 
 
@@ -48,15 +48,36 @@ class UserController:
         """
         Shows the main page of the user interface.
         """
-        self._show_current_data()
-
         self._view.two_columns_layout(0.7, self._raise_awareness, self._quiz)
 
-        self._display_plots()
+        if not self._is_current_data_available():
+            self._view.data_not_available()
+        else:
+            self._show_current_data()
 
-        self._display_compare_who()
+            self._display_plots()
+
+            self._display_compare_who()
 
         self._display_sources()
+
+    def _is_current_data_available(self) -> bool:
+        """
+        Checks if the current data is available.
+
+        The current data is not available from 14:00 to 15:15.
+        This is because the API is queried every 15 minutes, and the
+        data is not available for a short period of time before and after
+        the new data is fetched.
+
+        :return: True if the current data is available, False otherwise.
+        """
+        current_time = datetime.now().time()
+        start_time = current_time.replace(hour=0, minute=0, second=0)
+        end_time = current_time.replace(hour=4, minute=15, second=0)
+        if start_time <= current_time <= end_time:
+            return False
+        return True
 
     def _display_sources(self) -> None:
         """
@@ -86,7 +107,6 @@ class UserController:
         Displays the plots on the main page of the user interface.
         """
         plot_type = self._view.view_option_selection(["Line Plot", "Gauge Plot"])
-
         if plot_type == "Line Plot":
             line_fig = self._prepare_line_plot()
             self._view.display_predictions_lineplot(line_fig)

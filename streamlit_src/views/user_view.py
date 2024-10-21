@@ -23,6 +23,19 @@ class UserView:
         st.sidebar.markdown("### Current Pollutant Concentrations and WHO Guidelines")
         st.sidebar.dataframe(merged_data_df, hide_index=True)
 
+    def data_not_available(self) -> None:
+        """
+        Show an error message indicating that data is not available.
+
+        This is shown when the current time is between 00:00 and 04:15, when the measurements aren't accurate enough to produce a prediction.
+        The data will be automatically updated at 04:15 with the prediction for the next three days.
+        """
+        st.markdown("### Data Not Available")
+
+        error_message = "🚨 Between 00:00 and 04:15, the measurements aren't accurate enough to produce a prediction or have an informative summary for today's air pollution. The data will be automatically updated at 04:15 with the prediction for the next three days."
+
+        self.two_columns_layout(0.7, lambda: st.error(error_message), lambda: None)
+
     def success(self, message: str) -> None:
         """
         Show a success message.
