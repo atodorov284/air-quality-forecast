@@ -34,7 +34,6 @@ class HomeController:
         elif switch == "Admin Dashboard":
             # Check if the admin is already logged in
             if st.session_state.is_admin_logged_in:
-                self.admin_controller.welcome_back()
                 self.admin_controller.show_dashboard()
             else:
                 password = self.home_view.prompt_admin_password()

@@ -51,85 +51,19 @@ class AdminController(UserController):
         """
 
         # This is sad but has to be done like this
-        features = [
-            "Temperature (lag=1)",
-            "O₃ (lag=1)",
-            "PM₂.₅ (lag=1)",
-            "Humidity (lag=1)",
-            "Solar Radiation (lag=1)",
-            "O₃ (lag=3)",
-            "Solar Radiation (lag=2)",
-            "Solar Radiation (lag=3)",
-            "NO₂ (lag=1)",
-            "O₃ (lag=2)",
-            "Wind Direction (lag=1)",
-            "Visibility (lag=1)",
-            "PM₁₀ (lag=1)",
-            "Visibility (lag=3)",
-            "Precipitation (lag=1)",
-            "Precipitation (lag=3)",
-            "Precipitation (lag=2)",
-            "Temperature (lag=2)",
-            "NO₂ (lag=3)",
-            "Humidity (lag=3)",
-            "Wind Speed (lag=2)",
-            "Wind Speed (lag=3)",
-            "PM₂.₅ (lag=3)",
-            "Temperature (lag=3)",
-            "Wind Speed (lag=1)",
-            "PM₂.₅ (lag=2)",
-            "Humidity (lag=2)",
-            "PM₁₀ (lag=2)",
-            "NO₂ (lag=2)",
-            "Visibility (lag=2)",
-            "Wind Direction (lag=3)",
-            "Wind Direction (lag=2)",
-            "PM₁₀ (lag=3)",
-        ]
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        grandparent_dir = os.path.dirname(parent_dir)
+        feature_importances_path = os.path.join(
+            grandparent_dir,
+            "data",
+            "other",
+            "feature_importance.csv",
+        )
 
-        importance_values = [
-            5.766941,
-            5.63263,
-            3.5815392,
-            3.475367,
-            3.456865,
-            2.3959482,
-            1.8265718,
-            1.6795981,
-            1.5732919,
-            1.464834,
-            1.2373743,
-            0.8109572,
-            0.60146403,
-            0.5048162,
-            0.49500573,
-            0.44572872,
-            0.41351405,
-            0.4023266,
-            0.38021353,
-            0.3769183,
-            0.3461746,
-            0.3079201,
-            0.285651,
-            0.28092846,
-            0.23774858,
-            0.20836349,
-            0.1959943,
-            0.18470103,
-            0.1738453,
-            0.16350256,
-            0.14222378,
-            0.14136884,
-            0.09763571,
-        ]
+        feature_importances = pd.read_csv(feature_importances_path)
 
-        self._view.display_feature_importance(features, importance_values)
-
-    def welcome_back(self) -> None:
-        """
-        Shows a welcome message for the admin interface.
-        """
-        self._view.welcome_back()
+        self._view.display_feature_importance(feature_importances)
 
     def _model_metrics(self) -> None:
         """

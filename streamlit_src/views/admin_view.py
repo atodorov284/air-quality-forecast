@@ -30,9 +30,7 @@ class AdminView(UserView):
         )
         return page
 
-    def display_feature_importance(
-        self, features: list, importance_values: list
-    ) -> None:
+    def display_feature_importance(self, feature_importances: pd.DataFrame) -> None:
         """
         Displays the feature importance graph using Plotly for better aesthetics.
 
@@ -40,14 +38,9 @@ class AdminView(UserView):
         :param importance_values: A list of corresponding importance values.
         """
         # Creating a DataFrame for better visualization with Plotly
-        feature_importance_df = pd.DataFrame(
-            {"Feature": features, "Importance": importance_values}
-        )
-
-        feature_importance_df.sort_values(by="Importance", ascending=True, inplace=True)
 
         fig = px.bar(
-            feature_importance_df,
+            feature_importances,
             x="Importance",
             y="Feature",
             orientation="h",
@@ -64,14 +57,6 @@ class AdminView(UserView):
         fig.update_layout(width=1500)
 
         st.plotly_chart(fig, use_container_width=True)
-
-    def welcome_back(self) -> None:
-        """
-        Welcomes the user back to the admin page.
-        """
-        st.empty()
-        st.success("Welcome back!")
-        st.empty()
 
     def upload_dataset(self) -> pd.DataFrame:
         """
