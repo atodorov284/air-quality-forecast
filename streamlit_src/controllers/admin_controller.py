@@ -68,11 +68,20 @@ class AdminController(UserController):
 
         self._view.display_feature_importance(feature_importances)
 
+    def _show_current_data(self) -> None:
+        """
+        Shows the current data on the main page of the user interface.
+        """
+        merged_data_df = self._prepare_data_for_view()
+        self._check_data_out_of_distribution(self._model.get_all_data_last_three_days())
+        self._view.show_current_data(merged_data_df)
+
     def _model_metrics(self) -> None:
         """
         Computes the metrics for the admin interface.
         """
-        pass
+        df = self._model.calculate_metrics()
+        self._view.display_datatable(df, "Model Metrics over Last Three Days")
 
     def _compute_distribution_statistics(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
@@ -265,7 +274,8 @@ class AdminController(UserController):
         Returns:
             bool: True if the input data is out of distribution, False otherwise.
         """
-        input_data.drop("date", axis=1, inplace=True)
+        if "date" in input_data.columns:
+            input_data.drop("date", axis=1, inplace=True)
 
         z_scores = (
             input_data - self._distribution_means.values.squeeze()
