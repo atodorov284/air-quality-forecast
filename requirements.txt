@@ -7,5 +7,7 @@ plotly
 pre-commit
 scikit-learn==1.5.2
 scikit-optimize==0.10.2
+sphinx
+sphinx_rtd_theme
 streamlit
 xgboost==2.1.1

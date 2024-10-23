@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>air_quality_forecast.data_pipeline &mdash; Air Quality Forecast  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            Air Quality Forecast
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">air-quality-forecast</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Air Quality Forecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">air_quality_forecast.data_pipeline</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for air_quality_forecast.data_pipeline</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">FeatureSelector</span><span class="p">,</span> <span class="n">InputValidator</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">joblib</span>
+
+
+<div class="viewcode-block" id="DataLoader">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.DataLoader">[docs]</a>
+<span class="k">class</span> <span class="nc">DataLoader</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_data_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">processed_data_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the DataLoader with paths to raw and processed data.</span>
+
+<span class="sd">        :param raw_data_path: Path to the raw data directory.</span>
+<span class="sd">        :param processed_data_path: Path to the processed data directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_type</span><span class="p">(</span><span class="n">raw_data_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;raw_data_path&quot;</span><span class="p">)</span>
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_type</span><span class="p">(</span><span class="n">processed_data_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;processed_data_path&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_data_path</span> <span class="o">=</span> <span class="n">raw_data_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed_data_path</span> <span class="o">=</span> <span class="n">processed_data_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_griftpark_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_utrecht_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load raw datasets when the class is called.</span>
+
+<span class="sd">        :return: Two Pandas DataFrames containing Griftpark and Utrecht data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_file_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data_path</span><span class="p">,</span> <span class="s2">&quot;raw_data_path&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_griftpark_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">raw_data_path</span><span class="p">,</span> <span class="s2">&quot;v1_raw_griftpark,-utrecht-air-quality.csv&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_utrecht_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data_path</span><span class="p">,</span> <span class="s2">&quot;v1_utrecht 2014-01-29 to 2024-09-11.csv&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_griftpark_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_utrecht_data</span>
+
+<div class="viewcode-block" id="DataLoader.save_to_csv">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.DataLoader.save_to_csv">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the data to a CSV file.</span>
+
+<span class="sd">        :param name: The name of the file to save.</span>
+<span class="sd">        :param data: The Pandas DataFrame to save as a CSV.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_type</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+
+        <span class="c1"># If the data is a numpy array, convert it to a Pandas DataFrame</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processed_data_path</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="FeatureProcessor">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.FeatureProcessor">[docs]</a>
+<span class="k">class</span> <span class="nc">FeatureProcessor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">griftpark_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">utrecht_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the FeatureProcessor with Griftpark and Utrecht data.</span>
+
+<span class="sd">        :param griftpark_data: Data from Griftpark in Pandas DataFrame format.</span>
+<span class="sd">        :param utrecht_data: Data from Utrecht in Pandas DataFrame format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_type</span><span class="p">(</span><span class="n">griftpark_data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="s2">&quot;griftpark_data&quot;</span><span class="p">)</span>
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_type</span><span class="p">(</span><span class="n">utrecht_data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="s2">&quot;utrecht_data&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">griftpark_data</span> <span class="o">=</span> <span class="n">griftpark_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">utrecht_data</span> <span class="o">=</span> <span class="n">utrecht_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="FeatureProcessor.merge_raw_data">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.FeatureProcessor.merge_raw_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">merge_raw_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merge the raw datasets based on date.</span>
+
+<span class="sd">        :return: The merged Pandas DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">utrecht_data</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">utrecht_data</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">griftpark_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">utrecht_data</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s2">&quot;datetime&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span></div>
+
+
+<div class="viewcode-block" id="FeatureProcessor.sort_data_by_date">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.FeatureProcessor.sort_data_by_date">[docs]</a>
+    <span class="k">def</span> <span class="nf">sort_data_by_date</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sort the merged data by date, starting from the most recent to the oldest.</span>
+
+<span class="sd">        :return: The sorted Pandas DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Merged data not available. Please merge data first.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;datetime&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span></div>
+
+
+<div class="viewcode-block" id="FeatureProcessor.select_features">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.FeatureProcessor.select_features">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_features</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select relevant features from the merged data.</span>
+
+<span class="sd">        :return: A Pandas DataFrame with selected features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Merged data not available. Please merge data first.&quot;</span><span class="p">)</span>
+
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="s2">&quot;merged_data&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Feature selection logic</span>
+        <span class="n">cols_to_drop</span> <span class="o">=</span> <span class="n">FeatureSelector</span><span class="o">.</span><span class="n">uninformative_columns</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">cols_to_drop</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span> <span class="o">=</span> <span class="n">FeatureSelector</span><span class="o">.</span><span class="n">rename_initial_columns</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span> <span class="o">=</span> <span class="n">FeatureSelector</span><span class="o">.</span><span class="n">change_to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">)</span>
+
+        <span class="n">selected_columns</span> <span class="o">=</span> <span class="n">FeatureSelector</span><span class="o">.</span><span class="n">select_cols_by_correlation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">)</span>
+        <span class="n">domain_knowledge_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;precip&quot;</span><span class="p">,</span> <span class="s2">&quot;windspeed&quot;</span><span class="p">,</span> <span class="s2">&quot;winddir&quot;</span><span class="p">]</span>
+        <span class="n">selected_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">selected_columns</span> <span class="o">+</span> <span class="n">domain_knowledge_columns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">[</span><span class="n">selected_columns</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span></div>
+
+
+<div class="viewcode-block" id="FeatureProcessor.apply_time_shift">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.FeatureProcessor.apply_time_shift">[docs]</a>
+    <span class="k">def</span> <span class="nf">apply_time_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply time shift to the dataset.</span>
+
+<span class="sd">        :param t_max: Maximum time shift, representing the number of days used to predict future values.</span>
+<span class="sd">        :return: The time-shifted Pandas DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Data not available. Please process data first.&quot;</span><span class="p">)</span>
+
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_type</span><span class="p">(</span><span class="n">t_max</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;t_max&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Time shifting logic</span>
+        <span class="n">all_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="o">.</span><span class="n">columns</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">all_cols</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">[[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2"> - day </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">[[</span><span class="n">col</span><span class="p">]]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span>
+                    <span class="o">-</span><span class="n">t</span>
+                <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;o3&quot;</span><span class="p">,</span> <span class="s2">&quot;no2&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">[[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2"> + day </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">[[</span><span class="n">col</span><span class="p">]]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span>
+                    <span class="n">t</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="o">.</span><span class="n">columns</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span></div>
+
+
+<div class="viewcode-block" id="FeatureProcessor.preprocess_data">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.FeatureProcessor.preprocess_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">preprocess_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Preprocess the data by applying feature selection, missing value removal, and time shift.</span>
+
+<span class="sd">        :return: The preprocessed Pandas DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_features</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;o3&quot;</span><span class="p">,</span> <span class="s2">&quot;no2&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_time_shift</span><span class="p">()</span>
+
+        <span class="c1"># Drop unnecessary columns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;pm25&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;pm10&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;temp&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;humidity&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;visibility&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;solarradiation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;precip&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;windspeed&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;winddir&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;29/01/2014&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;30/01/2014&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;31/01/2014&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;10/09/2024&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;11/09/2024&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_data</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_data</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform the entire feature processing when the class is called.</span>
+
+<span class="sd">        :return: The preprocessed Pandas DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merge_raw_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sort_data_by_date</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_data</span></div>
+
+
+
+<div class="viewcode-block" id="PreprocessingPipeline">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.PreprocessingPipeline">[docs]</a>
+<span class="k">class</span> <span class="nc">PreprocessingPipeline</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the PreprocessingPipeline with paths to raw and processed data directories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">project_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+        <span class="n">raw_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;raw&quot;</span><span class="p">)</span>
+        <span class="n">processed_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">raw_data_path</span><span class="p">,</span> <span class="n">processed_data_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_processor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span>
+
+<div class="viewcode-block" id="PreprocessingPipeline.train_test_split">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.PreprocessingPipeline.train_test_split">[docs]</a>
+    <span class="k">def</span> <span class="nf">train_test_split</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">test_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Split the data into training and testing sets.</span>
+
+<span class="sd">        :param data: The data to split as a Pandas DataFrame.</span>
+<span class="sd">        :return: A tuple of the training and testing data as Pandas DataFrames.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_type</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_type</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
+        <span class="n">InputValidator</span><span class="o">.</span><span class="n">validate_type</span><span class="p">(</span><span class="n">test_size</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;test_size&quot;</span><span class="p">)</span>
+
+        <span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span></div>
+
+
+<div class="viewcode-block" id="PreprocessingPipeline.run_pipeline">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.data_pipeline.PreprocessingPipeline.run_pipeline">[docs]</a>
+    <span class="k">def</span> <span class="nf">run_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the entire preprocessing pipeline: load data, process features, normalize, and save to CSV.</span>
+
+<span class="sd">        :param normalizer_type: The type of normalizer to use.</span>
+<span class="sd">        :return: The final normalized Pandas DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Step 1: Load raw data</span>
+        <span class="n">griftpark_data</span><span class="p">,</span> <span class="n">utrecht_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_loader</span><span class="p">()</span>
+
+        <span class="c1"># Step 2: Process features (merge, sort, feature selection, preprocessing, time shift)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_processor</span> <span class="o">=</span> <span class="n">FeatureProcessor</span><span class="p">(</span><span class="n">griftpark_data</span><span class="p">,</span> <span class="n">utrecht_data</span><span class="p">)</span>
+        <span class="n">preprocessed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_processor</span><span class="p">()</span>
+
+        <span class="c1"># Step 3: Save processed data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_loader</span><span class="o">.</span><span class="n">save_to_csv</span><span class="p">(</span>
+            <span class="s2">&quot;v3_lagged_no_missing_predicted_data.csv&quot;</span><span class="p">,</span> <span class="n">preprocessed_data</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Step 4: Split data into train and test sets</span>
+        <span class="n">columns_to_predict</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;no2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;o3&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;no2 + day 1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;o3 + day 1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;no2 + day 2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;o3 + day 2&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">preprocessed_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns_to_predict</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">preprocessed_data</span><span class="p">[</span><span class="n">columns_to_predict</span><span class="p">]</span>
+        <span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># Step 5: Normalize data for 2 sets (x_train, x_test)</span>
+        <span class="n">x_train</span><span class="p">[</span><span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span>
+            <span class="n">x_train</span><span class="p">[</span><span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">x_test</span><span class="p">[</span><span class="n">x_test</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="n">x_test</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
+
+        <span class="n">project_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+        <span class="n">saved_models_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;saved_models&quot;</span><span class="p">)</span>
+        <span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">saved_models_path</span><span class="p">,</span> <span class="s2">&quot;normalizer.joblib&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Convert the normalized NumPy array back to a DataFrame</span>
+        <span class="c1"># normalized_x_train = pd.DataFrame(x_train, columns=preprocessed_data.columns, index=preprocessed_data.index)</span>
+
+        <span class="c1"># Step 6: Save normalized data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_loader</span><span class="o">.</span><span class="n">save_to_csv</span><span class="p">(</span><span class="s2">&quot;x_train.csv&quot;</span><span class="p">,</span> <span class="n">x_train</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_loader</span><span class="o">.</span><span class="n">save_to_csv</span><span class="p">(</span><span class="s2">&quot;x_test.csv&quot;</span><span class="p">,</span> <span class="n">x_test</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_loader</span><span class="o">.</span><span class="n">save_to_csv</span><span class="p">(</span><span class="s2">&quot;y_train.csv&quot;</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_loader</span><span class="o">.</span><span class="n">save_to_csv</span><span class="p">(</span><span class="s2">&quot;y_test.csv&quot;</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+
+        <span class="c1"># Convert the normalized NumPy array back to a DataFrame</span>
+        <span class="c1"># normalized_df = pd.DataFrame(normalized_data, columns=preprocessed_data.columns, index=preprocessed_data.index)</span>
+
+        <span class="k">return</span> <span class="n">preprocessed_data</span></div>
+</div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">PreprocessingPipeline</span><span class="p">()</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">run_pipeline</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Aleksandar Todorov, Christian Kobriger, Lukasz Sawala, Csenge Szoke.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

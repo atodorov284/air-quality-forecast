@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>air_quality_forecast.model_development &mdash; Air Quality Forecast  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            Air Quality Forecast
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">air-quality-forecast</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Air Quality Forecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">air_quality_forecast.model_development</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for air_quality_forecast.model_development</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">mlflow.sklearn</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">root_mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">TimeSeriesSplit</span>
+<span class="kn">from</span> <span class="nn">skopt</span> <span class="kn">import</span> <span class="n">BayesSearchCV</span>
+<span class="kn">from</span> <span class="nn">skopt.space</span> <span class="kn">import</span> <span class="n">Real</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">Categorical</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeRegressor</span>
+<span class="kn">from</span> <span class="nn">xgboost</span> <span class="kn">import</span> <span class="n">XGBRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+<span class="n">RANDOM_SEED</span> <span class="o">=</span> <span class="mi">4242</span>
+
+
+<div class="viewcode-block" id="RegressorTrainer">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.model_development.RegressorTrainer">[docs]</a>
+<span class="k">class</span> <span class="nc">RegressorTrainer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">experiment_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">regressor</span><span class="p">:</span> <span class="n">BaseEstimator</span><span class="p">,</span>
+        <span class="n">param_space</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">cv_splits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the RegressorTrainer.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            experiment_name (str): The name of the MLflow experiment.</span>
+<span class="sd">            regressor (sklearn model): The regressor to optimize.</span>
+<span class="sd">            param_space (dict): The parameter space for Bayesian optimization.</span>
+<span class="sd">            cv_splits (int): Number of splits for cross-validation (default is 5).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span> <span class="o">=</span> <span class="n">experiment_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_regressor</span> <span class="o">=</span> <span class="n">regressor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_param_space</span> <span class="o">=</span> <span class="n">param_space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cv_splits</span> <span class="o">=</span> <span class="n">cv_splits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bayes_search</span><span class="p">:</span> <span class="n">BayesSearchCV</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">None</span>  <span class="c1"># Will hold the BayesSearchCV object</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_iter</span> <span class="o">=</span> <span class="n">n_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_run</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="RegressorTrainer.port_in_use">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.model_development.RegressorTrainer.port_in_use">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">port_in_use</span><span class="p">(</span><span class="n">port</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if a port is in use.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            port (int): Port to check.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the port is in use, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+            <span class="c1"># This actually returns an int and not a bool</span>
+            <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">connect_ex</span><span class="p">((</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="RegressorTrainer.launch_mlflow_server">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.model_development.RegressorTrainer.launch_mlflow_server">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">launch_mlflow_server</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch MLflow server at http://127.0.0.1:5000, if not already running.</span>
+
+<span class="sd">        If the port is already in use, it will print a message saying so.</span>
+<span class="sd">        If there is an error launching the server, it will print the error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="mi">5000</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">RegressorTrainer</span><span class="o">.</span><span class="n">port_in_use</span><span class="p">(</span><span class="n">port</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                    <span class="p">[</span><span class="s2">&quot;py&quot;</span><span class="p">,</span> <span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;mlflow&quot;</span><span class="p">,</span> <span class="s2">&quot;ui&quot;</span><span class="p">,</span> <span class="s2">&quot;--port&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">port</span><span class="p">)],</span>
+                    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MLflow server launched at http://127.0.0.1:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                        <span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;mlflow&quot;</span><span class="p">,</span> <span class="s2">&quot;ui&quot;</span><span class="p">,</span> <span class="s2">&quot;--port&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">port</span><span class="p">)],</span>
+                        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                        <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MLflow server launched at http://127.0.0.1:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error launching MLflow server:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="s2">&quot;Both py -m mlflow ui and python -m mlflow ui failed. Please run the server yourself.&quot;</span>
+                    <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MLflow server is running at http://127.0.0.1:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_set_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">x_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">y_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the training and test data as class attributes.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            x_train (np.ndarray): Training data features.</span>
+<span class="sd">            y_train (np.ndarray): Training data labels.</span>
+<span class="sd">            x_test (np.ndarray): Test data features.</span>
+<span class="sd">            y_test (np.ndarray): Test data labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setup_mlflow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up MLflow configuration.</span>
+
+<span class="sd">        This method launches the MLflow server, sets the MLflow experiment name and</span>
+<span class="sd">        tracking URI, enables system metrics logging, and turns on autologging of</span>
+<span class="sd">        metrics and parameters.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">RegressorTrainer</span><span class="o">.</span><span class="n">launch_mlflow_server</span><span class="p">()</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://localhost:5000/&quot;</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">enable_system_metrics_logging</span><span class="p">()</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span><span class="n">silent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_perform_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform Bayesian optimization for hyperparameters.</span>
+
+<span class="sd">        This method initializes and performs a BayesSearchCV search for the best</span>
+<span class="sd">        hyperparameters of the regressor. The search is performed on the training</span>
+<span class="sd">        data using a TimeSeriesSplit cross-validation scheme. The best</span>
+<span class="sd">        hyperparameters and the corresponding mean squared error are logged to</span>
+<span class="sd">        MLflow.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If training data has not been set. Call `_set_data` first.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_train</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_train</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Training data has not been set. Call `_set_data` first.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set up TimeSeriesSplit for cross-validation</span>
+        <span class="n">time_series_split</span> <span class="o">=</span> <span class="n">TimeSeriesSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cv_splits</span><span class="p">)</span>
+
+        <span class="c1"># Initialize and perform BayesSearchCV</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bayes_search</span> <span class="o">=</span> <span class="n">BayesSearchCV</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_regressor</span><span class="p">,</span>
+            <span class="n">search_spaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_param_space</span><span class="p">,</span>
+            <span class="n">n_iter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_iter</span><span class="p">,</span>  <span class="c1"># Number of iterations for the search</span>
+            <span class="n">cv</span><span class="o">=</span><span class="n">time_series_split</span><span class="p">,</span>  <span class="c1"># Cross-validation scheme</span>
+            <span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;neg_mean_squared_error&quot;</span><span class="p">,</span>  <span class="c1"># Metric for scoring</span>
+            <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># Use all available CPU cores</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># To display progress</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_SEED</span><span class="p">,</span>  <span class="c1"># Ensures reproducibility</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bayes_search</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_train</span><span class="p">)</span>
+
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bayes_search</span><span class="o">.</span><span class="n">best_params_</span><span class="p">)</span>
+
+        <span class="n">best_regressor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bayes_search</span><span class="o">.</span><span class="n">best_estimator_</span>
+        <span class="n">train_mse</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_y_train</span><span class="p">,</span> <span class="n">best_regressor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_train</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;Correct Train MSE&quot;</span><span class="p">,</span> <span class="n">train_mse</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_evaluate_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate the best model on the test data and log metrics.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If test data has not been set. Call `_set_data` first.</span>
+<span class="sd">            ValueError: If Bayesian search has not been performed. Call `_perform_search` first.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_test</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_test</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Test data has not been set. Call `_set_data` first.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bayes_search</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Bayesian search has not been performed. Call `_perform_search` first.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">best_regressor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bayes_search</span><span class="o">.</span><span class="n">best_estimator_</span>
+
+        <span class="c1"># Evaluate the best model</span>
+        <span class="n">test_mse</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_y_test</span><span class="p">,</span> <span class="n">best_regressor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_test</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">test_rmse</span> <span class="o">=</span> <span class="n">root_mean_squared_error</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_y_test</span><span class="p">,</span> <span class="n">best_regressor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_test</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;Correct Test MSE&quot;</span><span class="p">,</span> <span class="n">test_mse</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;Correct Test RMSE&quot;</span><span class="p">,</span> <span class="n">test_rmse</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_optimize_and_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform Bayesian optimization for hyperparameters and evaluate the best model on the test data.</span>
+
+<span class="sd">        This method wraps `_perform_search` and `_evaluate_model` in a single MLflow run.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_perform_search</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_model</span><span class="p">()</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">end_run</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RegressorTrainer.run">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.model_development.RegressorTrainer.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">x_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">y_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the Bayesian optimization workflow.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            x_train (np.ndarray): Training data features.</span>
+<span class="sd">            y_train (np.ndarray): Training data labels.</span>
+<span class="sd">            x_test (np.ndarray): Test data features.</span>
+<span class="sd">            y_test (np.ndarray): Test data labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_data</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_mlflow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimize_and_evaluate</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="convert_param_space">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.model_development.convert_param_space">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_param_space</span><span class="p">(</span><span class="n">param_space</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a parameter space dictionary to a format usable by skopt.</span>
+
+<span class="sd">    This function takes a dictionary where the keys are parameter names and the</span>
+<span class="sd">    values are lists of two values that represent the range of possible values</span>
+<span class="sd">    for that parameter. The function then converts these ranges to skopt</span>
+<span class="sd">    parameter objects and returns a new dictionary where the parameter names</span>
+<span class="sd">    are the same but the values are now skopt parameter objects.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        param_space (dict): A dictionary with parameter names as keys and ranges</span>
+<span class="sd">            of possible values as values.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary with parameter names as keys and skopt parameter</span>
+<span class="sd">            objects as values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">converted_space</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">param</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">param_space</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">converted_space</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">Categorical</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">):</span>
+            <span class="n">converted_space</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">Integer</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">):</span>
+            <span class="n">converted_space</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">Real</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">):</span>
+            <span class="n">converted_space</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">Categorical</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown parameter type for </span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">converted_space</span></div>
+
+
+
+<div class="viewcode-block" id="run_bayesian_optimization">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.model_development.run_bayesian_optimization">[docs]</a>
+<span class="k">def</span> <span class="nf">run_bayesian_optimization</span><span class="p">(</span>
+    <span class="n">x_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">x_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">y_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">experiment_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">regressor</span><span class="p">:</span> <span class="n">BaseEstimator</span><span class="p">,</span>
+    <span class="n">param_space</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run Bayesian optimization to search for the best hyperparameters for a given regressor.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        x_train (np.ndarray): Training data features.</span>
+<span class="sd">        y_train (np.ndarray): Training data labels.</span>
+<span class="sd">        x_test (np.ndarray): Test data features.</span>
+<span class="sd">        y_test (np.ndarray): Test data labels.</span>
+<span class="sd">        experiment_name (str): The name of the MLflow experiment.</span>
+<span class="sd">        regressor (sklearn model): The regressor to optimize.</span>
+<span class="sd">        param_space (dict): The parameter space for Bayesian optimization.</span>
+<span class="sd">        n_iter (int): Number of iterations for the search.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">RegressorTrainer</span><span class="p">(</span>
+        <span class="n">experiment_name</span><span class="o">=</span><span class="n">experiment_name</span><span class="p">,</span>
+        <span class="n">regressor</span><span class="o">=</span><span class="n">regressor</span><span class="p">,</span>
+        <span class="n">param_space</span><span class="o">=</span><span class="n">param_space</span><span class="p">,</span>
+        <span class="n">n_iter</span><span class="o">=</span><span class="n">n_iter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="train_all_models">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.model_development.train_all_models">[docs]</a>
+<span class="k">def</span> <span class="nf">train_all_models</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Train all models using Bayesian optimization.</span>
+
+<span class="sd">    This function is used to train the three models (DecisionTreeRegressor, XGBRegressor, and RandomForestRegressor)</span>
+<span class="sd">    using Bayesian optimization.</span>
+
+<span class="sd">    The training and test data are loaded from the &quot;data/processed&quot; directory.</span>
+
+<span class="sd">    The hyperparameter search spaces for each model are loaded from &quot;configs/hyperparameter_search_spaces.yaml&quot;.</span>
+
+<span class="sd">    The trained models are logged to the MLflow server.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+
+    <span class="n">project_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">processed_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">)</span>
+
+    <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">processed_data_path</span><span class="p">,</span> <span class="s2">&quot;x_train.csv&quot;</span><span class="p">),</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">processed_data_path</span><span class="p">,</span> <span class="s2">&quot;y_train.csv&quot;</span><span class="p">),</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">processed_data_path</span><span class="p">,</span> <span class="s2">&quot;x_test.csv&quot;</span><span class="p">),</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">processed_data_path</span><span class="p">,</span> <span class="s2">&quot;y_test.csv&quot;</span><span class="p">),</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">configs_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;configs&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">configs_data_path</span><span class="p">,</span> <span class="s2">&quot;hyperparameter_search_spaces.yaml&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="n">param_space_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+    <span class="n">param_space_config</span><span class="p">[</span><span class="s2">&quot;decision_tree&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_param_space</span><span class="p">(</span>
+        <span class="n">param_space_config</span><span class="p">[</span><span class="s2">&quot;decision_tree&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">param_space_config</span><span class="p">[</span><span class="s2">&quot;decision_tree&quot;</span><span class="p">])</span>
+    <span class="n">param_space_config</span><span class="p">[</span><span class="s2">&quot;xgboost&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_param_space</span><span class="p">(</span><span class="n">param_space_config</span><span class="p">[</span><span class="s2">&quot;xgboost&quot;</span><span class="p">])</span>
+    <span class="n">param_space_config</span><span class="p">[</span><span class="s2">&quot;random_forest&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_param_space</span><span class="p">(</span>
+        <span class="n">param_space_config</span><span class="p">[</span><span class="s2">&quot;random_forest&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">run_bayesian_optimization</span><span class="p">(</span>
+        <span class="n">x_train</span><span class="p">,</span>
+        <span class="n">y_train</span><span class="p">,</span>
+        <span class="n">x_test</span><span class="p">,</span>
+        <span class="n">y_test</span><span class="p">,</span>
+        <span class="n">experiment_name</span><span class="o">=</span><span class="s2">&quot;DecisionTree-BayesianOptimization&quot;</span><span class="p">,</span>
+        <span class="n">regressor</span><span class="o">=</span><span class="n">DecisionTreeRegressor</span><span class="p">(),</span>
+        <span class="n">param_space</span><span class="o">=</span><span class="n">param_space_config</span><span class="p">[</span><span class="s2">&quot;decision_tree&quot;</span><span class="p">],</span>
+        <span class="n">n_iter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">run_bayesian_optimization</span><span class="p">(</span>
+        <span class="n">x_train</span><span class="p">,</span>
+        <span class="n">y_train</span><span class="p">,</span>
+        <span class="n">x_test</span><span class="p">,</span>
+        <span class="n">y_test</span><span class="p">,</span>
+        <span class="n">experiment_name</span><span class="o">=</span><span class="s2">&quot;XGBoost-BayesianOptimization&quot;</span><span class="p">,</span>
+        <span class="n">regressor</span><span class="o">=</span><span class="n">XGBRegressor</span><span class="p">(),</span>
+        <span class="n">param_space</span><span class="o">=</span><span class="n">param_space_config</span><span class="p">[</span><span class="s2">&quot;xgboost&quot;</span><span class="p">],</span>
+        <span class="n">n_iter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">run_bayesian_optimization</span><span class="p">(</span>
+        <span class="n">x_train</span><span class="p">,</span>
+        <span class="n">y_train</span><span class="p">,</span>
+        <span class="n">x_test</span><span class="p">,</span>
+        <span class="n">y_test</span><span class="p">,</span>
+        <span class="n">experiment_name</span><span class="o">=</span><span class="s2">&quot;RandomForest-BayesianOptimization&quot;</span><span class="p">,</span>
+        <span class="n">regressor</span><span class="o">=</span><span class="n">RandomForestRegressor</span><span class="p">(),</span>
+        <span class="n">param_space</span><span class="o">=</span><span class="n">param_space_config</span><span class="p">[</span><span class="s2">&quot;random_forest&quot;</span><span class="p">],</span>
+        <span class="n">n_iter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="train_one_model">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.model_development.train_one_model">[docs]</a>
+<span class="k">def</span> <span class="nf">train_one_model</span><span class="p">(</span>
+    <span class="n">x_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">x_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">y_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">experiment_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">param_space</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">model</span> <span class="o">==</span> <span class="s2">&quot;decision_tree&quot;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">DecisionTreeRegressor</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">model</span> <span class="o">==</span> <span class="s2">&quot;xgboost&quot;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">model</span> <span class="o">==</span> <span class="s2">&quot;random_forest&quot;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown model: </span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">run_bayesian_optimization</span><span class="p">(</span>
+        <span class="n">x_train</span><span class="p">,</span>
+        <span class="n">y_train</span><span class="p">,</span>
+        <span class="n">x_test</span><span class="p">,</span>
+        <span class="n">y_test</span><span class="p">,</span>
+        <span class="n">experiment_name</span><span class="o">=</span><span class="n">experiment_name</span><span class="p">,</span>
+        <span class="n">regressor</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">param_space</span><span class="o">=</span><span class="n">param_space</span><span class="p">,</span>
+        <span class="n">n_iter</span><span class="o">=</span><span class="n">n_iter</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># train_all_models()</span>
+    <span class="n">RegressorTrainer</span><span class="o">.</span><span class="n">launch_mlflow_server</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Aleksandar Todorov, Christian Kobriger, Lukasz Sawala, Csenge Szoke.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>streamlit_src.views.user_view &mdash; Air Quality Forecast  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            Air Quality Forecast
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">air-quality-forecast</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Air Quality Forecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">streamlit_src.views.user_view</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for streamlit_src.views.user_view</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+
+<div class="viewcode-block" id="UserView">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView">[docs]</a>
+<span class="k">class</span> <span class="nc">UserView</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to handle all user interface elements.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="UserView.show_current_data">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.show_current_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_current_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">merged_data_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Show the current pollutant concentrations along with WHO guidelines.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            merged_data_df (pd.DataFrame): A pandas DataFrame containing the current pollutant concentrations and WHO guidelines.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Today&#39;s Date: **</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%B </span><span class="si">%d</span><span class="s1">, %Y&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">**&quot;</span>
+        <span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;### Current Pollutant Concentrations and WHO Guidelines&quot;</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">dataframe</span><span class="p">(</span><span class="n">merged_data_df</span><span class="p">,</span> <span class="n">hide_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserView.data_not_available">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.data_not_available">[docs]</a>
+    <span class="k">def</span> <span class="nf">data_not_available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Show an error message indicating that data is not available.</span>
+
+<span class="sd">        This is shown when the current time is between 00:00 and 04:15, when the measurements aren&#39;t accurate enough to produce a prediction.</span>
+<span class="sd">        The data will be automatically updated at 04:15 with the prediction for the next three days.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;### Data Not Available&quot;</span><span class="p">)</span>
+
+        <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;🚨 Between 00:00 and 04:15, the measurements aren&#39;t accurate enough to produce a prediction or have an informative summary for today&#39;s air pollution. The data will be automatically updated at 04:15 with the prediction for the next three days.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">two_columns_layout</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">),</span> <span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserView.success">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.success">[docs]</a>
+    <span class="k">def</span> <span class="nf">success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Show a success message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message (str): The message to be displayed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserView.error">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.error">[docs]</a>
+    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Show an error message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message (str): The message to be displayed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserView.display_predictions_lineplot">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.display_predictions_lineplot">[docs]</a>
+    <span class="k">def</span> <span class="nf">display_predictions_lineplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fig</span><span class="p">:</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Show a line plot of the predictions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fig (go.Figure): The plotly figure to be displayed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">plotly_chart</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserView.display_predictions_gaugeplot">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.display_predictions_gaugeplot">[docs]</a>
+    <span class="k">def</span> <span class="nf">display_predictions_gaugeplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gauge_plots</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Show a gauge plot of the predictions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gauge_plots (list): A list of tuples containing the day, formatted date, and two plotly figures (for NO2 and O3).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">formatted_date</span><span class="p">,</span> <span class="n">fig_no2</span><span class="p">,</span> <span class="n">fig_o3</span> <span class="ow">in</span> <span class="n">gauge_plots</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;#### Day </span><span class="si">{</span><span class="n">day</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">formatted_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">columns</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="k">with</span> <span class="n">col1</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">plotly_chart</span><span class="p">(</span><span class="n">fig_no2</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">col2</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">plotly_chart</span><span class="p">(</span><span class="n">fig_o3</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserView.view_option_selection">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.view_option_selection">[docs]</a>
+    <span class="k">def</span> <span class="nf">view_option_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ask the user to select a plot type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            plot_type (list): A list of strings containing the options to be displayed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The selected option.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;### Visualizing Air Quality Predictions&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">st</span><span class="o">.</span><span class="n">selectbox</span><span class="p">(</span><span class="s2">&quot;Select a plot type:&quot;</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserView.compare_to_who">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.compare_to_who">[docs]</a>
+    <span class="k">def</span> <span class="nf">compare_to_who</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">warnings</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare the current pollutant concentrations with WHO guidelines and display the results.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            warnings (list): A list of tuples containing the pollutant, message, and level (error or success) of the warning.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">pollutant</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">warnings</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserView.two_columns_layout">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.two_columns_layout">[docs]</a>
+    <span class="k">def</span> <span class="nf">two_columns_layout</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">left_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">right_function</span><span class="p">:</span> <span class="n">Callable</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Divide the page into two columns and call the left and right functions within them.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ratio : float</span>
+<span class="sd">            The ratio of the left to the right column.</span>
+<span class="sd">        left_function : Callable</span>
+<span class="sd">            The function to be called in the left column.</span>
+<span class="sd">        right_function : Callable</span>
+<span class="sd">            The function to be called in the right column.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">columns</span><span class="p">([</span><span class="n">ratio</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">ratio</span><span class="p">],</span> <span class="n">gap</span><span class="o">=</span><span class="s2">&quot;large&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">left</span><span class="p">:</span>
+            <span class="n">left_function</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">right</span><span class="p">:</span>
+            <span class="n">right_function</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="UserView.raise_awareness">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.raise_awareness">[docs]</a>
+    <span class="k">def</span> <span class="nf">raise_awareness</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">random_fact</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">awareness_expanders</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">health_message</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Raise awareness about air quality issues and provide health recommendations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            random_fact (str): A random fact about air quality.</span>
+<span class="sd">            awareness_expanders (list): A list of tuples containing the title and content of the expanders.</span>
+<span class="sd">            health_message (dict): A dictionary containing the health recommendation message and type (error or success).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;### Air Quality Awareness&quot;</span><span class="p">)</span>
+        <span class="c1"># Awareness sections</span>
+        <span class="k">for</span> <span class="n">expander_title</span><span class="p">,</span> <span class="n">expander_content</span> <span class="ow">in</span> <span class="n">awareness_expanders</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">expander</span><span class="p">(</span><span class="n">expander_title</span><span class="p">):</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">expander_content</span><span class="p">)</span>
+
+        <span class="c1"># Fact section</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;### Did You Know?&quot;</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">random_fact</span><span class="p">)</span>
+
+        <span class="c1"># Health recommendation section</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;### Health Recommendations Based on Current Levels&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">health_message</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">health_message</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">health_message</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="UserView.quiz">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.quiz">[docs]</a>
+    <span class="k">def</span> <span class="nf">quiz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ask a quiz question and return the answer and whether the answer was correct.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            question (str): The question to be asked.</span>
+<span class="sd">            options (list): A list of strings containing the options.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing the answer and a boolean indicating whether the answer was correct.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;### Quick Quiz: How Much Do You Know About Air Pollution?&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;quiz_form&quot;</span><span class="p">):</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">radio</span><span class="p">(</span><span class="s2">&quot;Choose an option:&quot;</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+            <span class="n">submit_button</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">form_submit_button</span><span class="p">(</span><span class="s2">&quot;Submit Answer&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">submit_button</span><span class="p">,</span> <span class="n">answer</span></div>
+
+
+<div class="viewcode-block" id="UserView.print_sources">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.user_view.UserView.print_sources">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print the sources used in the application.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sources (list): A list of tuples containing the source text and URL.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;### Learn More&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">source_text</span><span class="p">,</span> <span class="n">source_url</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">source_text</span><span class="si">}</span><span class="s2">](</span><span class="si">{</span><span class="n">source_url</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Aleksandar Todorov, Christian Kobriger, Lukasz Sawala, Csenge Szoke.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>
