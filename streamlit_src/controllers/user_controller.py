@@ -22,8 +22,10 @@ class UserController:
         """
         self._model = AirQualityModel()
         self._view = UserView()
-        self._today_data = self._model.get_today_data()
-        self._next_three_days = self._model.next_three_day_predictions()
+
+        if self._is_current_data_available():
+            self._today_data = self._model.get_today_data()
+            self._next_three_days = self._model.next_three_day_predictions()
 
         self._who_guidelines = {
             "Pollutant": ["NO2 (µg/m³)", "O3 (µg/m³)"],
@@ -48,7 +50,8 @@ class UserController:
         """
         Shows the main page of the user interface.
         """
-        self._view.two_columns_layout(0.7, self._raise_awareness, self._quiz)
+        if self._is_current_data_available():
+            self._view.two_columns_layout(0.7, self._raise_awareness, self._quiz)
 
         if not self._is_current_data_available():
             self._view.data_not_available()
@@ -65,7 +68,7 @@ class UserController:
         """
         Checks if the current data is available.
 
-        The current data is not available from 14:00 to 15:15.
+        The current data is not available from 00:00 to 04:15.
         This is because the API is queried every 15 minutes, and the
         data is not available for a short period of time before and after
         the new data is fetched.
@@ -73,8 +76,8 @@ class UserController:
         :return: True if the current data is available, False otherwise.
         """
         current_time = datetime.now().time()
-        start_time = current_time.replace(hour=0, minute=0, second=0)
-        end_time = current_time.replace(hour=4, minute=15, second=0)
+        start_time = datetime.strptime("00:00", "%H:%M").time()
+        end_time = datetime.strptime("04:15", "%H:%M").time()
         if start_time <= current_time <= end_time:
             return False
         return True
