@@ -9,7 +9,7 @@
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
-
+  
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
@@ -17,17 +17,17 @@
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-
-
+          
+          
           <a href="../../../index.html" class="icon icon-home">
             Air Quality Forecast
           </a>
@@ -67,7 +67,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-
+             
   <h1>Source code for streamlit_src.controllers.admin_controller</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
@@ -121,6 +121,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_model_metrics</span><span class="p">()</span></div>
 
 
+<div class="viewcode-block" id="AdminController._feature_importance">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.admin_controller.AdminController._feature_importance">[docs]</a>
     <span class="k">def</span> <span class="nf">_feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the feature importance values and their corresponding feature names.</span>
@@ -142,23 +144,32 @@
 
         <span class="n">feature_importances</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">feature_importances_path</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">display_feature_importance</span><span class="p">(</span><span class="n">feature_importances</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">display_feature_importance</span><span class="p">(</span><span class="n">feature_importances</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="AdminController._show_current_data">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.admin_controller.AdminController._show_current_data">[docs]</a>
     <span class="k">def</span> <span class="nf">_show_current_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Shows the current data on the main page of the user interface.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">merged_data_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_data_for_view</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_data_out_of_distribution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">get_all_data_last_three_days</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">show_current_data</span><span class="p">(</span><span class="n">merged_data_df</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">show_current_data</span><span class="p">(</span><span class="n">merged_data_df</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="AdminController._model_metrics">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.admin_controller.AdminController._model_metrics">[docs]</a>
     <span class="k">def</span> <span class="nf">_model_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the metrics for the admin interface.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">calculate_metrics</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">display_datatable</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;Model Metrics over Last Three Days&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">display_datatable</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;Model Metrics over Last Three Days&quot;</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="AdminController._compute_distribution_statistics">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.admin_controller.AdminController._compute_distribution_statistics">[docs]</a>
     <span class="k">def</span> <span class="nf">_compute_distribution_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the means and standard deviations of the features in the dataset.</span>
@@ -208,8 +219,11 @@
             <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">formatted_means</span><span class="p">,</span> <span class="n">formatted_stds</span>
+        <span class="k">return</span> <span class="n">formatted_means</span><span class="p">,</span> <span class="n">formatted_stds</span></div>
 
+
+<div class="viewcode-block" id="AdminController._make_custom_predictions">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.admin_controller.AdminController._make_custom_predictions">[docs]</a>
     <span class="k">def</span> <span class="nf">_make_custom_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes a custom prediction for the admin interface.</span>
@@ -255,8 +269,11 @@
                 <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Please confirm all the requirements by marking the checkboxes.&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Please confirm all the requirements by marking the checkboxes.&quot;</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="AdminController._make_prediction">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.admin_controller.AdminController._make_prediction">[docs]</a>
     <span class="k">def</span> <span class="nf">_make_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes a prediction using an XGBoost model.</span>
@@ -282,8 +299,11 @@
             <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">prediction</span>
+        <span class="k">return</span> <span class="n">prediction</span></div>
 
+
+<div class="viewcode-block" id="AdminController._data_is_valid">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.admin_controller.AdminController._data_is_valid">[docs]</a>
     <span class="k">def</span> <span class="nf">_data_is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Performs data validation on the uploaded user data.</span>
@@ -334,8 +354,11 @@
 
         <span class="c1"># If all checks passed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;Data validation passed successfully.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
+
+<div class="viewcode-block" id="AdminController._check_data_out_of_distribution">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.admin_controller.AdminController._check_data_out_of_distribution">[docs]</a>
     <span class="k">def</span> <span class="nf">_check_data_out_of_distribution</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -378,6 +401,7 @@
             <span class="k">return</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;Input data is within the expected distribution.&quot;</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 
@@ -394,7 +418,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
         </div>
@@ -405,7 +429,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
 
 </body>
 </html>

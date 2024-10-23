@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
-
+  
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
@@ -20,17 +20,17 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="streamlit_src package" href="streamlit_src.html" />
-    <link rel="prev" title="air-quality-forecast" href="modules.html" />
+    <link rel="prev" title="air-quality-forecast" href="modules.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-
-
+          
+          
           <a href="index.html" class="icon icon-home">
             Air Quality Forecast
           </a>
@@ -119,7 +119,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-
+             
   <section id="air-quality-forecast-package">
 <h1>air_quality_forecast package<a class="headerlink" href="#air-quality-forecast-package" title="Link to this heading"></a></h1>
 <section id="submodules">
@@ -131,6 +131,35 @@
 <dt class="sig sig-object py" id="air_quality_forecast.api_caller.APICaller">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">air_quality_forecast.api_caller.</span></span><span class="sig-name descname"><span class="pre">APICaller</span></span><a class="reference internal" href="_modules/air_quality_forecast/api_caller.html#APICaller"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.api_caller.APICaller" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="air_quality_forecast.api_caller.APICaller._current_time">
+<span class="sig-name descname"><span class="pre">_current_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/api_caller.html#APICaller._current_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.api_caller.APICaller._current_time" title="Link to this definition"></a></dt>
+<dd><p>Returns the current time in the format “YYYY-MM-DD HH:MM:SS”.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="air_quality_forecast.api_caller.APICaller._get_luchtmeet_data">
+<span class="sig-name descname"><span class="pre">_get_luchtmeet_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/api_caller.html#APICaller._get_luchtmeet_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.api_caller.APICaller._get_luchtmeet_data" title="Link to this definition"></a></dt>
+<dd><p>Fetches luchtmeet data for a specific formula from the API over the past three days.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>components</strong> – The components to query (e.g., ‘O3,NO2,PM25’).</p></li>
+<li><p><strong>station_number</strong> – The station number to query.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of JSON data from the API response for the given components.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="air_quality_forecast.api_caller.APICaller._two_days_ago">
+<span class="sig-name descname"><span class="pre">_two_days_ago</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/api_caller.html#APICaller._two_days_ago"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.api_caller.APICaller._two_days_ago" title="Link to this definition"></a></dt>
+<dd><p>Returns the date and time three days before the current time.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="air_quality_forecast.api_caller.APICaller.get_luchtmeet_data">
 <span class="sig-name descname"><span class="pre">get_luchtmeet_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/api_caller.html#APICaller.get_luchtmeet_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.api_caller.APICaller.get_luchtmeet_data" title="Link to this definition"></a></dt>
@@ -306,6 +335,68 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">air_quality_forecast.model_development.</span></span><span class="sig-name descname"><span class="pre">RegressorTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regressor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseEstimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_space</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_splits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/air_quality_forecast/model_development.html#RegressorTrainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.model_development.RegressorTrainer" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
+<dt class="sig sig-object py" id="air_quality_forecast.model_development.RegressorTrainer._evaluate_model">
+<span class="sig-name descname"><span class="pre">_evaluate_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/model_development.html#RegressorTrainer._evaluate_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.model_development.RegressorTrainer._evaluate_model" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the best model on the test data and log metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If test data has not been set. Call <cite>_set_data</cite> first.</p></li>
+<li><p><strong>ValueError</strong> – If Bayesian search has not been performed. Call <cite>_perform_search</cite> first.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="air_quality_forecast.model_development.RegressorTrainer._optimize_and_evaluate">
+<span class="sig-name descname"><span class="pre">_optimize_and_evaluate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/air_quality_forecast/model_development.html#RegressorTrainer._optimize_and_evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.model_development.RegressorTrainer._optimize_and_evaluate" title="Link to this definition"></a></dt>
+<dd><p>Perform Bayesian optimization for hyperparameters and evaluate the best model on the test data.</p>
+<p>This method wraps <cite>_perform_search</cite> and <cite>_evaluate_model</cite> in a single MLflow run.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="air_quality_forecast.model_development.RegressorTrainer._perform_search">
+<span class="sig-name descname"><span class="pre">_perform_search</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/model_development.html#RegressorTrainer._perform_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.model_development.RegressorTrainer._perform_search" title="Link to this definition"></a></dt>
+<dd><p>Perform Bayesian optimization for hyperparameters.</p>
+<p>This method initializes and performs a BayesSearchCV search for the best
+hyperparameters of the regressor. The search is performed on the training
+data using a TimeSeriesSplit cross-validation scheme. The best
+hyperparameters and the corresponding mean squared error are logged to
+MLflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If training data has not been set. Call <cite>_set_data</cite> first.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="air_quality_forecast.model_development.RegressorTrainer._set_data">
+<span class="sig-name descname"><span class="pre">_set_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_train</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/model_development.html#RegressorTrainer._set_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.model_development.RegressorTrainer._set_data" title="Link to this definition"></a></dt>
+<dd><p>Set the training and test data as class attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_train</strong> (<em>np.ndarray</em>) – Training data features.</p></li>
+<li><p><strong>y_train</strong> (<em>np.ndarray</em>) – Training data labels.</p></li>
+<li><p><strong>x_test</strong> (<em>np.ndarray</em>) – Test data features.</p></li>
+<li><p><strong>y_test</strong> (<em>np.ndarray</em>) – Test data labels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="air_quality_forecast.model_development.RegressorTrainer._setup_mlflow">
+<span class="sig-name descname"><span class="pre">_setup_mlflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/model_development.html#RegressorTrainer._setup_mlflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.model_development.RegressorTrainer._setup_mlflow" title="Link to this definition"></a></dt>
+<dd><p>Set up MLflow configuration.</p>
+<p>This method launches the MLflow server, sets the MLflow experiment name and
+tracking URI, enables system metrics logging, and turns on autologging of
+metrics and parameters.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="air_quality_forecast.model_development.RegressorTrainer.launch_mlflow_server">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">launch_mlflow_server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/model_development.html#RegressorTrainer.launch_mlflow_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.model_development.RegressorTrainer.launch_mlflow_server" title="Link to this definition"></a></dt>
 <dd><p>Launch MLflow server at <a class="reference external" href="http://127.0.0.1:5000">http://127.0.0.1:5000</a>, if not already running.</p>
@@ -452,6 +543,24 @@ without having to run all other algorithms.</p>
 <dt class="sig sig-object py" id="air_quality_forecast.prediction.PredictorModels">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">air_quality_forecast.prediction.</span></span><span class="sig-name descname"><span class="pre">PredictorModels</span></span><a class="reference internal" href="_modules/air_quality_forecast/prediction.html#PredictorModels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.prediction.PredictorModels" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="air_quality_forecast.prediction.PredictorModels._load_models">
+<span class="sig-name descname"><span class="pre">_load_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/prediction.html#PredictorModels._load_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.prediction.PredictorModels._load_models" title="Link to this definition"></a></dt>
+<dd><p>Loads the pre-trained models from the saved_models directory.</p>
+<p>The models are loaded in the following order:</p>
+<ol class="arabic simple">
+<li><p>Decision Tree Regressor</p></li>
+<li><p>Random Forest Regressor</p></li>
+<li><p>XGBoost Regressor</p></li>
+</ol>
+<p>The models are loaded from the following paths:</p>
+<ul class="simple">
+<li><p>Decision Tree Regressor: saved_models/decision_tree.pkl</p></li>
+<li><p>Random Forest Regressor: saved_models/random_forest.pkl</p></li>
+<li><p>XGBoost Regressor: saved_models/xgboost.xgb</p></li>
+</ul>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="air_quality_forecast.prediction.PredictorModels.decision_tree_predictions">
 <span class="sig-name descname"><span class="pre">decision_tree_predictions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/air_quality_forecast/prediction.html#PredictorModels.decision_tree_predictions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#air_quality_forecast.prediction.PredictorModels.decision_tree_predictions" title="Link to this definition"></a></dt>
@@ -605,7 +714,7 @@ without having to run all other algorithms.</p>
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
         </div>
@@ -616,7 +725,7 @@ without having to run all other algorithms.</p>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
 
 </body>
 </html>
