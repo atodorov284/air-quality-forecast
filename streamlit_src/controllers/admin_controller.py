@@ -250,7 +250,7 @@ class AdminController(UserController):
             )
             return False
 
-        if not (data_without_date >= 0).all().all():
+        if not ((data_without_date >= 0) | data_without_date.isna()).all().all():
             self._view.error(
                 "The dataset contains negative values. All values must be positive."
             )
