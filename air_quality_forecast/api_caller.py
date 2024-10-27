@@ -17,8 +17,6 @@ class APICaller:
         self._components_erzeijstraat = "PM10"
         self._vc_base_url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/weatherdata/history"
         self._vc_key = os.environ.get("VC_KEY")
-        if not self._vc_key:
-            self._vc_key = "3LBMJ7SAH5BCSL5H2DYS5YQ5K"
         self._vc_max_wait = 30
         self._successful_request_code = 200
 
