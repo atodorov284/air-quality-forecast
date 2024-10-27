@@ -9,6 +9,7 @@ class APICaller:
         """
         Initializes the APICaller class. Gets the luchtmeet data for the griftpark and erzeijstraat stations.
         Also can merge the data and present it in a lagged format for the model's input.
+        Uses an env variable for the VC API key.
         """
         self._luchtmeet_griftpark = "NL10643"
         self._luchtmeet_erzeijstraat = "NL10639"
