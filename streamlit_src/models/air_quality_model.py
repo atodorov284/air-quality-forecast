@@ -36,6 +36,14 @@ class AirQualityModel:
         self._WHO_NO2_LEVEL = 25
         self._WHO_O3_LEVEL = 100
 
+    @property
+    def WHO_NO2_LEVEL(self):
+        return self._WHO_NO2_LEVEL
+
+    @property
+    def WHO_O3_LEVEL(self):
+        return self._WHO_O3_LEVEL
+
     def get_today_data(self) -> pd.Series:
         """
         Returns the air quality data for today from the past 3 days data.
