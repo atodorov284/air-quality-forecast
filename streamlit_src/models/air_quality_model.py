@@ -19,11 +19,24 @@ PAST_DATA_PATH = os.path.join(
 
 
 class AirQualityModel:
-    def __init__(self) -> None:
-        self.WHO_NO2_LEVEL = 25
-        self.WHO_O3_LEVEL = 100
+    """
+    A class that loads the air quality model and makes predictions.
 
-    def get_today_data(self):
+    The model is loaded from a pickle file located at PREDICTION_PATH.
+
+    Attributes
+    ----------
+    _WHO_NO2_LEVEL : int
+        The WHO air quality level for NO2 in micrograms per cubic meter.
+    _WHO_O3_LEVEL : int
+        The WHO air quality level for O3 in micrograms per cubic meter.
+    """
+
+    def __init__(self) -> None:
+        self._WHO_NO2_LEVEL = 25
+        self._WHO_O3_LEVEL = 100
+
+    def get_today_data(self) -> pd.Series:
         """
         Returns the air quality data for today from the past 3 days data.
 
@@ -38,14 +51,14 @@ class AirQualityModel:
         today = last_three_days.iloc[0]
         return today
 
-    def next_three_day_predictions(self):
-        # Load data from the specified path (assuming it's a CSV file)
+    def next_three_day_predictions(self) -> pd.DataFrame:
+        """
+        Returns the predictions for the next three days.
+        """
         data = pd.read_csv(PREDICTION_PATH)
 
-        # correct data is todays data row
         data = data[data["date"] == pd.Timestamp.now().strftime("%Y-%m-%d")]
 
-        # Create a DataFrame with the relevant information for the next three days
         next_three_days = pd.DataFrame(
             {
                 "Day": ["Day 1", "Day 2", "Day 3"],
@@ -64,11 +77,31 @@ class AirQualityModel:
 
         return next_three_days
 
-    def get_all_data_last_three_days(self):
+    def get_all_data_last_three_days(self) -> pd.DataFrame:
+        """
+        Returns all the air quality data for the last three days from the past 3 days data.
+
+        The data is obtained from a CSV file located at PAST_DATA_PATH.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame with the air quality data for the last three days.
+        """
         data = pd.read_csv(PAST_DATA_PATH)
         return data
 
-    def get_last_three_days(self):
+    def get_last_three_days(self) -> pd.DataFrame:
+        """
+        Returns all the air quality data for the last three days from the past 3 days data.
+
+        The data is obtained from a CSV file located at PAST_DATA_PATH.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame with the air quality data for the last three days.
+        """
         # Extract NO2 and O3 values for the last three days
         data = pd.read_csv(PAST_DATA_PATH)
         last_three_days = pd.DataFrame(
@@ -88,7 +121,17 @@ class AirQualityModel:
         )
         return last_three_days
 
-    def calculate_metrics(self):
+    def calculate_metrics(self) -> pd.DataFrame:
+        """
+        Calculates the root mean squared error for the predictions of the last three days.
+
+        The data is obtained from a CSV file located at PREDICTION_PATH.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame with the root mean squared error for the predictions of the last three days.
+        """
         model_predictions = pd.read_csv(PREDICTION_PATH)
 
         yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")

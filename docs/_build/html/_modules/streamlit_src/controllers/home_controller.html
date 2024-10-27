@@ -9,7 +9,7 @@
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
-  
+
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
@@ -17,17 +17,17 @@
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="../../../index.html" class="icon icon-home">
             Air Quality Forecast
           </a>
@@ -67,7 +67,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <h1>Source code for streamlit_src.controllers.home_controller</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
 <span class="kn">import</span> <span class="nn">time</span>
@@ -80,11 +80,24 @@
 <div class="viewcode-block" id="HomeController">
 <a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.home_controller.HomeController">[docs]</a>
 <span class="k">class</span> <span class="nc">HomeController</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles the logic for the home page, including switching between user and admin views.</span>
+
+<span class="sd">    The home page is the main entry point for the Streamlit application.</span>
+<span class="sd">    It contains a text input for the admin password, which is hashed and compared to the stored hash.</span>
+<span class="sd">    If the password is correct, the user is logged in as an admin and the admin view is displayed.</span>
+<span class="sd">    Otherwise, the user view is displayed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># This needs to be hidden as an env variable but we couldn&#39;t manage with HuggingFace yet, severe security issue</span>
     <span class="n">__ADMIN_PASSWORD_HASH</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9&quot;</span>
     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the HomeController class by setting up the home view, user controller,</span>
+<span class="sd">        and admin controller. Also triggers the _run method to start the application.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">home_view</span> <span class="o">=</span> <span class="n">HomeView</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_controller</span> <span class="o">=</span> <span class="n">UserController</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">admin_controller</span> <span class="o">=</span> <span class="n">AdminController</span><span class="p">()</span>
@@ -92,14 +105,25 @@
 
 <div class="viewcode-block" id="HomeController._hash_password">
 <a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.home_controller.HomeController._hash_password">[docs]</a>
-    <span class="k">def</span> <span class="nf">_hash_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_hash_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Hash the input password using SHA-256.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="HomeController._run">
 <a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.home_controller.HomeController._run">[docs]</a>
-    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the application logic for the home page.</span>
+
+<span class="sd">        This method is responsible for rendering the home page and</span>
+<span class="sd">        handling the user&#39;s choice of whether to view the user dashboard</span>
+<span class="sd">        or admin dashboard. If the user chooses to view the admin dashboard,</span>
+<span class="sd">        the user is prompted to enter the admin password. If the password</span>
+<span class="sd">        is valid, the user is logged in as an admin and the admin dashboard</span>
+<span class="sd">        is displayed. If the password is invalid, the user is logged out and</span>
+<span class="sd">        the user dashboard is displayed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;is_admin_logged_in&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
             <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">is_admin_logged_in</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -139,7 +163,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -150,7 +174,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

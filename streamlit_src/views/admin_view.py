@@ -18,7 +18,13 @@ class AdminView(UserView):
         """
         super().__init__()
 
-    def show_admin_pages(self):
+    def show_admin_pages(self) -> str:
+        """
+        Displays a dropdown for selecting different admin pages.
+
+        Returns:
+            str: The selected page from the dropdown.
+        """
         page = st.selectbox(
             "Select a page:",
             [
@@ -76,8 +82,8 @@ class AdminView(UserView):
         )
         st.markdown("""
     - **Normalization**: The data must be **unnormalized**.
-    - **Units**: All measurements should be in **micrograms/m³**.
-    - **Data Structure**: The dataset must contain a total of **33 columns** with the following order:
+    - **Units**: All measurements should as specified below**.
+    - **Data Structure**: The dataset must contain a total of **33 columns** (34 with date) with the following order:
         - **Optional**: `date`
         - `PM25` (today)
         - `PM10` (today)
