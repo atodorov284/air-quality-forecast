@@ -61,6 +61,7 @@ class AdminView(UserView):
 
         fig.update_layout(height=600)
         fig.update_layout(width=1500)
+        fig.update_layout(yaxis={"dtick": 1})
 
         st.plotly_chart(fig, use_container_width=True)
 
