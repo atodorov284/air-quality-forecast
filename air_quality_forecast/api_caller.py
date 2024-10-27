@@ -26,13 +26,21 @@ class APICaller:
         """
         Returns the current time in the format "YYYY-MM-DD HH:MM:SS".
         """
-        return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        return (
+            (datetime.now())
+            .replace(hour=23, minute=59, second=59, microsecond=0)
+            .strftime("%Y-%m-%dT%H:%M:%S")
+        )
 
     def _two_days_ago(self) -> str:
         """
         Returns the date and time three days before the current time.
         """
-        return (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%dT%H:%M:%S")
+        return (
+            (datetime.now() - timedelta(days=2))
+            .replace(hour=0, minute=0, second=0, microsecond=0)
+            .strftime("%Y-%m-%dT%H:%M:%S")
+        )
 
     def _get_luchtmeet_data(self, components: str, station_number: int) -> list:
         """
@@ -45,7 +53,6 @@ class APICaller:
         end_time = self._current_time()
         start_time = self._two_days_ago()
         url = f"{self._base_luchtmeet_url}?station_number={station_number}&components={components}&page=1&order_by=timestamp_measured&order_direction=desc&start={start_time}&end={end_time}"
-
         response = requests.get(url)
         if response.status_code == self._successful_request_code:
             return response.json().get("data", [])
@@ -103,7 +110,6 @@ class APICaller:
         start_date = self._two_days_ago()
         end_date = self._current_time()
         url = f"{self._vc_base_url}?&aggregateHours=24&startDateTime={start_date}&endDateTime={end_date}&unitGroup=metric&contentType=json&dayStartTime=0:0:00&dayEndTime=0:0:00&location=Utrecht&key={self._vc_key}"
-
         try:
             response = requests.get(url, timeout=self._vc_max_wait)
             response.raise_for_status()
