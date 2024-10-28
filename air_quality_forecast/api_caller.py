@@ -18,9 +18,6 @@ class APICaller:
         self._components_erzeijstraat = "PM10"
         self._vc_base_url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/weatherdata/history"
         self._vc_key = os.environ.get("VC_KEY")
-        if self._vc_key is None:
-            # Severe security issue, needs to be fixed ASAP
-            self._vc_key = "3LBMJ7SAH5BCSL5H2DYS5YQ5K"
         self._vc_max_wait = 30
         self._successful_request_code = 200
 
@@ -129,9 +126,11 @@ class APICaller:
                     "wdir",
                 ]
                 df = pd.DataFrame(data["locations"]["Utrecht"]["values"])
-
                 df = df.reindex(columns=selected_columns)
                 df = df[selected_columns]
+                df["datetimeStr"] = pd.to_datetime(df["datetimeStr"]).apply(
+                    lambda x: x.strftime("%Y-%m-%d")
+                )
                 df.set_index("datetimeStr", inplace=True)
 
                 df.index = pd.to_datetime(df.index)
@@ -158,9 +157,6 @@ class APICaller:
         """
         air_data = self.get_luchtmeet_data()
         weather_data = self.get_vc_data()
-
-        print(air_data)
-        print(weather_data)
 
         df = pd.merge(air_data, weather_data, on="date")
 
