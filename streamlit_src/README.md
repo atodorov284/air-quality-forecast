@@ -65,3 +65,23 @@ Our **Controller** modules serve as intermediaries, connecting the model's data 
    - **`admin_controller.py`:** Manages the logic for the admin dashboard, extending the `UserController` to provide additional features tailored to admin needs.
 
 ---
+
+## 🚀 How to Run the App
+
+To launch the Utrecht Air Quality Monitoring application, follow these simple steps:
+
+1. **Navigate to the `streamlit_src` folder** in your terminal where the app files are located.
+
+2. **Run the Streamlit application** by entering the following command:
+   ```bash
+   streamlit run app.py
+> [!TIP]
+> **Alternative Path**: If you are not in the `streamlit_src` folder, provide the full path to `app.py`. For example, from the root directory:
+> - **Windows**: 
+>   ```bash
+>   streamlit run .\streamlit_src\app.py
+>   ```
+> - **macOS/Linux**: 
+>   ```bash
+>   streamlit run ./streamlit_src/app.py
+>   ```
