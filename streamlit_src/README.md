@@ -13,6 +13,32 @@ Welcome to the **Utrecht Air Quality Monitoring** application! This interactive 
 
 ---
 
+## 📂 Folder Structure
+```plaintext
+streamlit_src/
+├── controllers/
+│   ├── home_controller.py      # Manages logic for the main dashboard and user access
+│   ├── user_controller.py      # Controls data display on the user dashboard
+│   └── admin_controller.py     # Extends user_controller for admin-specific features
+│
+├── json_interactions/          # Handles JSON data interactions for configuration and storage
+│   └── (JSON handling scripts)
+│
+├── models/
+│   └── air_quality_model.py    # Contains model loading, preprocessing, and prediction logic
+│
+├── views/
+│   ├── home_view.py            # Sets up the main interface and role selection
+│   ├── user_view.py            # Displays air quality data and forecasts for users
+│   └── admin_view.py           # Presents analytics and monitoring tools for admins
+│
+├── README.md                   # Documentation for the Streamlit application
+├── __init__.py                 # Initializes the streamlit_src package
+└── app.py                      # Main entry point to run the Streamlit application
+```
+
+---
+
 ## ⚙️ Design Pattern: MVC
 
 To make the application easy to manage and extend, we’ve structured it using the **Model-View-Controller (MVC)** design pattern. Here’s how each part contributes:
