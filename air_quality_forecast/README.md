@@ -43,6 +43,22 @@ The **`parser_ui.py`** script manages the **retraining protocol** and provides a
 
 These modes allow users to seamlessly switch between retraining and prediction tasks, making it easy to keep the model updated and generate new forecasts as required.
 
+### 💻 Example Usage of the Retraining Protocol
+
+Below are example commands for using the **retraining** and **prediction** functionalities in `parser_ui.py`.
+
+#### Retraining the Model
+
+To retrain a model (e.g., `xgboost`) with a specified dataset:
+
+```bash
+
+```
+To generate predictions with a trained model (e.g., `xgboost`) on a new dataset:
+```bash
+
+```
+
 ---
 ## 🚀 How to Run the Scripts
 
