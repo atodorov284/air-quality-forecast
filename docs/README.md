@@ -20,3 +20,16 @@ docs/
 ├── streamlit_src.models.rst       # Documentation for models module
 ├── streamlit_src.rst              # General documentation for the streamlit_src folder
 └── streamlit_src.views.rst        # Documentation for views module
+```
+---
+
+## 📖 Usage
+
+### Generating HTML Documentation
+
+To build the HTML documentation, navigate to the `docs` folder in your terminal and use one of the following commands:
+
+- **On Unix-based systems** (Linux/macOS):
+  ```bash
+- **On Windows systems**
+  ```bash
