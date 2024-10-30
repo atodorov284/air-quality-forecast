@@ -48,14 +48,14 @@ First, navigate to the `air-quality-forecast` folder, which contains the source 
 cd air-quality-forecast
 ```
 
-**Running the Data Pipeline**: 
+**🛠️ Running the Data Pipeline**: 
 Execute `data_pipeline.py` within the `air-quality-forecast` folder, which contains the source code for this project. This script will preprocess the data and store the processed datasets in `data/processed`, with files named `x_train`, `x_test`, `y_train`, and `y_test`.
 
    ```bash
    python data_pipeline.py
    ```
 
-**View the MLFlow Dashboard**: 
+**📊 View the MLFlow Dashboard**: 
 To track experiments, run `model_development.py`, which will start an MLFlow server on `localhost` at port `5000`.
 
 ```bash
@@ -66,32 +66,14 @@ python model_development.py
 > ```bash
 > mlflow ui --port 5000
 >  ```
+> You might need to grant admin permissions for this process
+
+**🔄 Using the parser to retrain the model or make predictions on new data**:
+Instructions on how to use the retraining protocol or making predictions on new data can be found in the `README.md` in the `air-quality-forecast` directory
 
 > [!NOTE]
-> You might need to grant admin permissions for this process
+>The retrain datasets need to be under data/retrain and the prediction dataset needs to be under data/inference.
 ---
-**Using the parser to retrain the model or make predictions on new data**
-To retrain a model or predict, run `main.py` with the following arguments:
-positional arguments:
-  {xgboost,decision_tree,random_forest}
-                        Model to retrain or predict.
-
-options:
-  -h, --help            show this help message and exit
-  --retrain             Re-train the model.
-  --predict             Predict using the trained model.
-
-
-**IMPORTANT**
-The retrain datasets need to be under data/retrain and the prediction dataset needs to be under data/inference.
-
-If --retrain is selected, specify the dataset name, which has to be under data/inference. For example, if the dataset is named x_test.csv and you want to predict using the xgboost model, run:
-`main.py --predict --prediction_dataset x_test.csv xgboost`
-
-Similarly, to retrain xgboost for example, run:
-`main.py --retrain --x_train x_train.csv --x_test x_test.csv --y_train y_train.csv --y_test y_test.csv --n_iter 50 xgboost`
-
-
 > [!IMPORTANT]
 > The notebooks in this project were used as scratch for analysis and data merge and do not reflect our thorough methodology (source is under air-quality-forecast). Some extra scripts for the generation of our plots in the report can be found under extra_scripts.
 
