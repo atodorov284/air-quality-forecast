@@ -18,8 +18,58 @@ Air pollution is a significant environmental concern, especially in urban areas,
 
 In the Netherlands, cities like Utrecht experience challenges concerning air quality due to urbanization, transportation, and industrial activities. Developing a system that can provide accurate and robust real-time air quality monitoring and reliable forecasts for future pollution levels would allow authorities and residents to take preventive measures and adjust their future activities based on expected air quality. This project focuses on the time-series forecasting of air pollution levels, specifically NO<sub>2</sub> and O<sub>3</sub> concentrations, for the next three days. This task can be framed as a regression problem, where the goal is to predict continuous values based on historical environmental data. Moreover, it provides infrastructure for real-time prediction, based on recent measurements.
 
-## How To Run This Code
+---
+## Streamlit Application
 
+Explore the interactive air quality forecast for Utrecht through our Streamlit app on Hugging Face Spaces:
+
+[Air Quality Forecasting App](https://huggingface.co/spaces/03chrisk/air-quality-forecasting)
+
+---
+
+## 🚀 How to Run the Scripts
+
+### Setting Up
+
+**Clone the Repository**: Start by cloning the repository to your local machine.
+   ```bash
+   git clone https://github.com/atodorov284/air-quality-forecast.git
+   cd air-quality-forecast
+   ```
+**Set Up Environment**:
+   Make sure all dependencies are installed by running the following `requirements.txt` file from the repository root:
+   ```bash
+   pip install -r requirements.txt
+   ```
+### Running Source Code
+First, navigate to the `air-quality-forecast` folder, which contains the source code for the project:
+
+```bash
+cd air-quality-forecast
+```
+
+**Running the Data Pipeline**: 
+Execute `data_pipeline.py` within the `air-quality-forecast` folder, which contains the source code for this project. This script will preprocess the data and store the processed datasets in `data/processed`, with files named `x_train`, `x_test`, `y_train`, and `y_test`.
+
+   ```bash
+   python data_pipeline.py
+   ```
+
+**View the MLFlow Dashboard**: 
+To track experiments, run `model_development.py`, which will start an MLFlow server on `localhost` at port `5000`.
+
+```bash
+python model_development.py
+```
+> [!TIP]
+> If the server does not start automatically, manually run the MLFlow UI using:
+> ```bash
+> mlflow ui --port 5000
+>  ```
+
+> [!NOTE]
+> You might need to grant admin permissions for this process
+---
 Currently, this repository finished the model development stage. 
 
 To run the data pipeline, run `data_pipeline.py` under air-quality forecast, which is the folder that contains the source code of this project. The processed and split datasets can be found under data/processed, namely x_train, x_val, x_test, y_train, y_val, y_test.
@@ -48,11 +98,12 @@ If --retrain is selected, specify the dataset name, which has to be under data/i
 Similarly, to retrain xgboost for example, run:
 `main.py --retrain --x_train x_train.csv --x_test x_test.csv --y_train y_train.csv --y_test y_test.csv --n_iter 50 xgboost`
 
-## DISCLAIMER
 
-The notebooks in this project were used as scratch for analysis and data merge and do not reflect our thorough methodology (source is under air-quality-forecast). Some extra scripts for the generation of our plots in the report can be found under extra_scripts.
+> [!IMPORTANT]
+> The notebooks in this project were used as scratch for analysis and data merge and do not reflect our thorough methodology (source is under air-quality-forecast). Some extra scripts for the generation of our plots in the report can be found under extra_scripts.
 
-## Project Organization
+---
+## 📂 Project Folder Structure
 
 ```
 ├── LICENSE            <- Open-source license if one is chosen
@@ -62,9 +113,9 @@ The notebooks in this project were used as scratch for analysis and data merge a
 │   ├── processed      <- The final, canonical data sets for modeling. Contains the train-test split.
 │   └── raw            <- The original, immutable data dump.
 │
-├──.github             <- Contains automated workflows for reproducibility and flake8 checks. 
+├──.github             <- Contains automated workflows for reproducibility, flake8 checks and scheduled updates. 
 │
-├── docs               <- TODO: A default mkdocs project; see www.mkdocs.org for details
+├── docs               <- Contains files to make the HTML documentation for this project usign Sphinx
 │
 ├───mlruns             <- Contains all the experiments ran using mlflow.
 │
@@ -97,14 +148,13 @@ The notebooks in this project were used as scratch for analysis and data merge a
     │
     ├── data_pipeline.py        <- Loads, extracts, and preprocesses the data. Final result is the train-test under data/processed
     │
-    ├── model_development.py    <- Trains the three models using k-fold CV and Bayesian hyperparameter tuning, displays the ML │                              dashboard if executed
+    ├── model_development.py    <- Trains the three models using k-fold CV and Bayesian hyperparameter tuning, displays the ML dashboard if executed
     │
     ├── prediction.py           <- Loads the models and makes an example prediction
     │
     ├── utils.py                <- Utility functions, e.g. validation
     │
     └── main.py                 <- To execute and start the project. Currently to make predictions.
+```
+---
 
---------
-
-# air-quality-forecast
