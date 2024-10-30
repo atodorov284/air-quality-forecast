@@ -70,14 +70,7 @@ python model_development.py
 > [!NOTE]
 > You might need to grant admin permissions for this process
 ---
-Currently, this repository finished the model development stage. 
-
-To run the data pipeline, run `data_pipeline.py` under air-quality forecast, which is the folder that contains the source code of this project. The processed and split datasets can be found under data/processed, namely x_train, x_val, x_test, y_train, y_val, y_test.
-
-To see the MLFlow dashboard, used to track experiments, run model_development.py. It will automatically create a server at your localhost port 5000. If this does not work, please run
-`mlflow ui --port 5000`
-in your console. You might need to give admin permissions to this process. The MLFlow dashboard contains all information about the experiments ran, including hyperparameters selected for each model. The selected models can be found under the Models menu.
-
+**Using the parser to retrain the model or make predictions on new data**
 To retrain a model or predict, run `main.py` with the following arguments:
 positional arguments:
   {xgboost,decision_tree,random_forest}
