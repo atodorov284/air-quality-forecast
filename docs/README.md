@@ -27,9 +27,25 @@ docs/
 
 ### Generating HTML Documentation
 
-To build the HTML documentation, navigate to the `docs` folder in your terminal and use one of the following commands:
+To build (or re-build) the HTML documentation, navigate to the `docs` folder in your terminal and use one of the following commands:
 
 - **On Unix-based systems** (Linux/macOS):
   ```bash
+  make clean
+  make html
+  ```
+  
 - **On Windows systems**
   ```bash
+  make clean
+  make html
+  ```
+
+- **Note that sometimes Windows systems might require you to trust the `make` command, in this case, you should run**
+  ```bash
+  .\make clean
+  .\make html
+  ```
+
+### Accessing the Documentation
+The documentation can be accessed in HTML form by navigating and opening `docs/_build/html/index.html`. This will display the documentation page in your preferred browser.
