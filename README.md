@@ -8,6 +8,7 @@ sdk_version: 1.39.0
 app_file: streamlit_src/app.py
 pinned: false
 ---
+
 # Air Quality Forecast
 
 <a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
