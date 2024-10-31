@@ -1,0 +1,554 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>streamlit_src.controllers.user_controller &mdash; Air Quality Forecast  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            Air Quality Forecast
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">air-quality-forecast</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Air Quality Forecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">streamlit_src.controllers.user_controller</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for streamlit_src.controllers.user_controller</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">models.air_quality_model</span> <span class="kn">import</span> <span class="n">AirQualityModel</span>
+<span class="kn">from</span> <span class="nn">views.user_view</span> <span class="kn">import</span> <span class="n">UserView</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+
+
+<div class="viewcode-block" id="UserController">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController">[docs]</a>
+<span class="k">class</span> <span class="nc">UserController</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to handle the user interface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the UserController class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">AirQualityModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span> <span class="o">=</span> <span class="n">UserView</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_current_data_available</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_today_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">get_today_data</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">next_three_day_predictions</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_who_guidelines</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Pollutant&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;NO2 (µg/m³)&quot;</span><span class="p">,</span> <span class="s2">&quot;O3 (µg/m³)&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;WHO Guideline&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">WHO_NO2_LEVEL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">WHO_O3_LEVEL</span><span class="p">],</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Ensure session state for _quiz and _quiz answer tracking</span>
+        <span class="k">if</span> <span class="s2">&quot;is_first_run&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">is_first_run</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="s2">&quot;question_choice&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">question_choice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="c1"># Paths for external data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interactions_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="s2">&quot;json_interactions/&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_facts_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interactions_path</span><span class="p">,</span> <span class="s2">&quot;facts.json&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_questions_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interactions_path</span><span class="p">,</span> <span class="s2">&quot;question.json&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_awareness_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interactions_path</span><span class="p">,</span> <span class="s2">&quot;awareness.json&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UserController.show_dashboard">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController.show_dashboard">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_dashboard</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shows the main page of the user interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_current_data_available</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">two_columns_layout</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raise_awareness</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quiz</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_current_data_available</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">data_not_available</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_show_current_data</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_display_plots</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_display_compare_who</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_sources</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="UserController._is_current_data_available">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._is_current_data_available">[docs]</a>
+    <span class="k">def</span> <span class="nf">_is_current_data_available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the current data is available.</span>
+
+<span class="sd">        The current data is not available from 00:00 to 04:15.</span>
+<span class="sd">        This is because the API is queried every 15 minutes, and the</span>
+<span class="sd">        data is not available for a short period of time before and after</span>
+<span class="sd">        the new data is fetched.</span>
+
+<span class="sd">        :return: True if the current data is available, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s2">&quot;00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;%H:%M&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s2">&quot;04:15&quot;</span><span class="p">,</span> <span class="s2">&quot;%H:%M&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">start_time</span> <span class="o">&lt;=</span> <span class="n">current_time</span> <span class="o">&lt;=</span> <span class="n">end_time</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="UserController._display_sources">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._display_sources">[docs]</a>
+    <span class="k">def</span> <span class="nf">_display_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays the sources on the main page of the user interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;WHO Air Quality Guidelines&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;https://www.who.int/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Air Pollution Facts&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;https://www.un.org/sustainabledevelopment/air-pollution/&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">print_sources</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserController._display_compare_who">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._display_compare_who">[docs]</a>
+    <span class="k">def</span> <span class="nf">_display_compare_who</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays the WHO comparison on the main page of the user interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">who_comparisons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compare_to_who</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">compare_to_who</span><span class="p">(</span><span class="n">who_comparisons</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserController._display_plots">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._display_plots">[docs]</a>
+    <span class="k">def</span> <span class="nf">_display_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays the plots on the main page of the user interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plot_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">view_option_selection</span><span class="p">([</span><span class="s2">&quot;Line Plot&quot;</span><span class="p">,</span> <span class="s2">&quot;Gauge Plot&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s2">&quot;Line Plot&quot;</span><span class="p">:</span>
+            <span class="n">line_fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_line_plot</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">display_predictions_lineplot</span><span class="p">(</span><span class="n">line_fig</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s2">&quot;Gauge Plot&quot;</span><span class="p">:</span>
+            <span class="n">gauge_plots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_gauge_plots</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">display_predictions_gaugeplot</span><span class="p">(</span><span class="n">gauge_plots</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserController._show_current_data">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._show_current_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">_show_current_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shows the current data on the main page of the user interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">merged_data_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_data_for_view</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">show_current_data</span><span class="p">(</span><span class="n">merged_data_df</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserController._prepare_data_for_view">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._prepare_data_for_view">[docs]</a>
+    <span class="k">def</span> <span class="nf">_prepare_data_for_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepares the current data for the view.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            The current data in a pandas DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">merged_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Pollutant&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;NO₂ (µg/m³)&quot;</span><span class="p">,</span> <span class="s2">&quot;O₃ (µg/m³)&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;Current&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_today_data</span><span class="p">[</span><span class="s2">&quot;NO2 (µg/m³)&quot;</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_today_data</span><span class="p">[</span><span class="s2">&quot;O3 (µg/m³)&quot;</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;WHO Guideline&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_who_guidelines</span><span class="p">[</span><span class="s2">&quot;WHO Guideline&quot;</span><span class="p">],</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">merged_data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserController._raise_awareness">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._raise_awareness">[docs]</a>
+    <span class="k">def</span> <span class="nf">_raise_awareness</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shows the awareness content on the main page of the user interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">random_fact</span><span class="p">,</span> <span class="n">awareness_expanders</span><span class="p">,</span> <span class="n">health_message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_awareness_content</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">raise_awareness</span><span class="p">(</span><span class="n">random_fact</span><span class="p">,</span> <span class="n">awareness_expanders</span><span class="p">,</span> <span class="n">health_message</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserController._prepare_awareness_content">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._prepare_awareness_content">[docs]</a>
+    <span class="k">def</span> <span class="nf">_prepare_awareness_content</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare awareness content including a random fact, expanders, and health message based on air quality data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Tuple[str, List[Tuple[str, str]], Dict[str, str]]</span>
+<span class="sd">            A tuple containing the random fact, awareness expanders, and health message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_facts_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">facts_file</span><span class="p">:</span>
+            <span class="n">facts</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">facts_file</span><span class="p">)</span>
+            <span class="n">random_fact</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">facts</span><span class="p">[</span><span class="s2">&quot;facts&quot;</span><span class="p">])</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_awareness_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">awareness_file</span><span class="p">:</span>
+            <span class="n">awareness</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">awareness_file</span><span class="p">)</span>
+            <span class="n">awareness_expanders</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">))</span> <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">awareness</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">]</span>
+
+        <span class="n">health_message</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_today_data</span><span class="p">[</span><span class="s2">&quot;NO2 (µg/m³)&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_who_guidelines</span><span class="p">[</span><span class="s2">&quot;WHO Guideline&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_today_data</span><span class="p">[</span><span class="s2">&quot;O3 (µg/m³)&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_who_guidelines</span><span class="p">[</span><span class="s2">&quot;WHO Guideline&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">health_message</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;🚨 High pollution levels today. Avoid outdoor activities if possible, especially for vulnerable groups.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">health_message</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">health_message</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;✅ Air quality is within safe limits today. Enjoy your outdoor activities!&quot;</span>
+            <span class="p">)</span>
+            <span class="n">health_message</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;success&quot;</span>
+
+        <span class="k">return</span> <span class="n">random_fact</span><span class="p">,</span> <span class="n">awareness_expanders</span><span class="p">,</span> <span class="n">health_message</span></div>
+
+
+<div class="viewcode-block" id="UserController._quiz">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._quiz">[docs]</a>
+    <span class="k">def</span> <span class="nf">_quiz</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Show a _quiz question and return the answer and whether the answer was correct.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing the answer and a boolean indicating whether the answer was correct.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">question_number</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">question_choice</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_questions_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">questions_file</span><span class="p">:</span>
+            <span class="n">quiz_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">questions_file</span><span class="p">)</span>
+            <span class="n">question</span> <span class="o">=</span> <span class="n">quiz_data</span><span class="p">[</span><span class="s2">&quot;quiz&quot;</span><span class="p">][</span><span class="n">question_number</span><span class="p">][</span><span class="s2">&quot;question&quot;</span><span class="p">]</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="n">quiz_data</span><span class="p">[</span><span class="s2">&quot;quiz&quot;</span><span class="p">][</span><span class="n">question_number</span><span class="p">][</span><span class="s2">&quot;options&quot;</span><span class="p">]</span>
+            <span class="n">submitted</span><span class="p">,</span> <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">quiz</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">submitted</span><span class="p">:</span>
+            <span class="n">correct_answer</span> <span class="o">=</span> <span class="n">quiz_data</span><span class="p">[</span><span class="s2">&quot;quiz&quot;</span><span class="p">][</span><span class="n">question_number</span><span class="p">][</span><span class="s2">&quot;answer&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">answer</span> <span class="o">==</span> <span class="n">correct_answer</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;Correct answer!&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_view</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Wrong answer! The correct answer was </span><span class="si">{</span><span class="n">correct_answer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">correct_answer</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserController._prepare_line_plot">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._prepare_line_plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">_prepare_line_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare a line plot for the next three days&#39; NO2 and O3 levels.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            go.Figure: A plotly figure object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tomorrow</span><span class="p">,</span> <span class="n">day_after_tomorrow</span><span class="p">,</span> <span class="n">two_days_after_tomorrow</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_next_three_days_dates</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">day_after_tomorrow</span><span class="p">,</span>
+            <span class="n">two_days_after_tomorrow</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+            <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">],</span>
+                <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span><span class="p">[</span><span class="s2">&quot;NO2 (µg/m³)&quot;</span><span class="p">],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines+markers+text&quot;</span><span class="p">,</span>  <span class="c1"># Add &#39;text&#39; to display the values on the graph</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;NO2 (µg/m³)&quot;</span><span class="p">,</span>
+                <span class="n">text</span><span class="o">=</span><span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> µg/m³&quot;</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span><span class="p">[</span><span class="s2">&quot;NO2 (µg/m³)&quot;</span><span class="p">]</span>
+                <span class="p">],</span>  <span class="c1"># Values displayed at each point</span>
+                <span class="n">textposition</span><span class="o">=</span><span class="s2">&quot;top right&quot;</span><span class="p">,</span>  <span class="c1"># Set the position of the text</span>
+                <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+            <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">],</span>
+                <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span><span class="p">[</span><span class="s2">&quot;O3 (µg/m³)&quot;</span><span class="p">],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines+markers+text&quot;</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;O3&quot;</span><span class="p">,</span>
+                <span class="n">text</span><span class="o">=</span><span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> µg/m³&quot;</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span><span class="p">[</span><span class="s2">&quot;O3 (µg/m³)&quot;</span><span class="p">]</span>
+                <span class="p">],</span>  <span class="c1"># Values displayed at each point</span>
+                <span class="n">textposition</span><span class="o">=</span><span class="s2">&quot;top right&quot;</span><span class="p">,</span>  <span class="c1"># Set the position of the text</span>
+                <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightblue&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># WHO guideline as horizontal dotted lines</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_hline</span><span class="p">(</span>
+            <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_who_guidelines</span><span class="p">[</span><span class="s2">&quot;WHO Guideline&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">line_dash</span><span class="o">=</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span>
+            <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+            <span class="n">annotation_text</span><span class="o">=</span><span class="s2">&quot;WHO NO2 Guideline&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_hline</span><span class="p">(</span>
+            <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_who_guidelines</span><span class="p">[</span><span class="s2">&quot;WHO Guideline&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">line_dash</span><span class="o">=</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span>
+            <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;lightblue&quot;</span><span class="p">,</span>
+            <span class="n">annotation_text</span><span class="o">=</span><span class="s2">&quot;WHO O3 Guideline&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Predictions for the Next 3 Days&quot;</span><span class="p">,</span>
+            <span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;Date&quot;</span><span class="p">,</span>
+            <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;Pollutant Concentration (µg/m³)&quot;</span><span class="p">,</span>
+            <span class="n">hovermode</span><span class="o">=</span><span class="s2">&quot;x unified&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="UserController._get_next_three_days_dates">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._get_next_three_days_dates">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_next_three_days_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the next three days&#39; dates.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple of three date objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tomorrow</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">day_after_tomorrow</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">two_days_after_tomorrow</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tomorrow</span><span class="p">,</span> <span class="n">day_after_tomorrow</span><span class="p">,</span> <span class="n">two_days_after_tomorrow</span></div>
+
+
+<div class="viewcode-block" id="UserController._compare_to_who">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._compare_to_who">[docs]</a>
+    <span class="k">def</span> <span class="nf">_compare_to_who</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare the current pollutant levels to WHO guidelines.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of tuples containing the pollutant name, comparison message, and message type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">comparisons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pollutant</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;NO2 (µg/m³)&quot;</span><span class="p">,</span> <span class="s2">&quot;O3 (µg/m³)&quot;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_today_data</span><span class="p">[</span><span class="n">pollutant</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_who_guidelines</span><span class="p">[</span><span class="s2">&quot;WHO Guideline&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">comparisons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">pollutant</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;🚨 </span><span class="si">{</span><span class="n">pollutant</span><span class="si">}</span><span class="s2"> levels exceed WHO guidelines!&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">comparisons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">pollutant</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;✅ </span><span class="si">{</span><span class="n">pollutant</span><span class="si">}</span><span class="s2"> levels are within safe limits&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">comparisons</span></div>
+
+
+<div class="viewcode-block" id="UserController._prepare_gauge_plots">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._prepare_gauge_plots">[docs]</a>
+    <span class="k">def</span> <span class="nf">_prepare_gauge_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare gauge plots for the next three days&#39; NO2 and O3 levels.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of tuples containing the day index, formatted date, and two plotly figures (for NO2 and O3).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tomorrow</span><span class="p">,</span> <span class="n">day_after_tomorrow</span><span class="p">,</span> <span class="n">two_days_after_tomorrow</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_next_three_days_dates</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">day_after_tomorrow</span><span class="p">,</span>
+            <span class="n">two_days_after_tomorrow</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="n">gauge_plots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">day</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">tomorrow</span><span class="p">,</span> <span class="n">day_after_tomorrow</span><span class="p">,</span> <span class="n">two_days_after_tomorrow</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">no2_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span><span class="p">[</span><span class="s2">&quot;NO2 (µg/m³)&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">o3_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_three_days</span><span class="p">[</span><span class="s2">&quot;O3 (µg/m³)&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">fig_no2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_gauge_plot</span><span class="p">(</span>
+                <span class="n">no2_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_who_guidelines</span><span class="p">[</span><span class="s2">&quot;WHO Guideline&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;NO2 (µg/m³)&quot;</span>
+            <span class="p">)</span>
+            <span class="n">fig_o3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_gauge_plot</span><span class="p">(</span>
+                <span class="n">o3_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_who_guidelines</span><span class="p">[</span><span class="s2">&quot;WHO Guideline&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;O3 (µg/m³)&quot;</span>
+            <span class="p">)</span>
+            <span class="n">gauge_plots</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%B </span><span class="si">%d</span><span class="s2">, %Y&quot;</span><span class="p">),</span> <span class="n">fig_no2</span><span class="p">,</span> <span class="n">fig_o3</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">gauge_plots</span></div>
+
+
+<div class="viewcode-block" id="UserController._create_gauge_plot">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._create_gauge_plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">_create_gauge_plot</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">guideline</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a gauge plot for a given pollutant value and guideline.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (float): The pollutant concentration value.</span>
+<span class="sd">            guideline (float): The WHO guideline value for the pollutant.</span>
+<span class="sd">            title (str): The title of the gauge plot.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            go.Figure: A Plotly figure representing the gauge plot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_color</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">guideline</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span>
+            <span class="n">go</span><span class="o">.</span><span class="n">Indicator</span><span class="p">(</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;gauge+number&quot;</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">},</span>
+                <span class="n">gauge</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;axis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">guideline</span><span class="p">]},</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">}},</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="UserController._get_color">
+<a class="viewcode-back" href="../../../streamlit_src.controllers.html#streamlit_src.controllers.user_controller.UserController._get_color">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">who_limit</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate a color based on a given pollutant value and WHO guideline.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (float): The pollutant concentration value.</span>
+<span class="sd">            who_limit (float): The WHO guideline value for the pollutant.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A hex color code representing the calculated color.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">half_who_limit</span> <span class="o">=</span> <span class="n">who_limit</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="n">half_who_limit</span><span class="p">:</span>
+            <span class="c1"># Green to Bright Yellow (exaggerated contrast)</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;rgba(0, </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="mi">255</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">half_who_limit</span><span class="p">)</span><span class="si">}</span><span class="s2">, 0, 1)&quot;</span>  <span class="c1"># Gradient from dark green to bright green</span>
+        <span class="k">elif</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="n">who_limit</span><span class="p">:</span>
+            <span class="c1"># Yellow to Dark Orange (stronger contrast between safe and danger)</span>
+            <span class="n">excess_value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">-</span> <span class="n">half_who_limit</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;rgba(255, </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="mi">200</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mi">200</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">excess_value</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">half_who_limit</span><span class="p">))</span><span class="si">}</span><span class="s2">, 0, 1)&quot;</span>  <span class="c1"># Gradient from bright yellow to dark orange</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Dark Red for exceeding WHO limit</span>
+            <span class="k">return</span> <span class="s2">&quot;rgba(180, 0, 0, 1)&quot;</span>  <span class="c1"># Dark red for dangerous levels</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Aleksandar Todorov, Christian Kobriger, Lukasz Sawala, Csenge Szoke.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

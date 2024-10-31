@@ -1,0 +1,72 @@
+name: Fetch, Predict, and Sync to Hugging Face Hub
+
+on:
+  schedule:
+    - cron: "15 2/6 * * *" # Runs every 6 hours 15 minute past the hour, starting at 04:00 GMT+2 (Netherlands), runs at 04:15, 10:15, 16:15, 22:15
+  push:
+    branches:
+      - deploy
+      - main
+
+jobs:
+  fetch-and-predict:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Git LFS
+        run: git lfs install
+
+      - name: Fetch LFS files
+        run: |
+          git lfs pull
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Python script
+        env:
+          VC_KEY: ${{ secrets.VC_KEY }}
+        run: |
+          python air_quality_forecast/get_prediction_data.py
+
+      - name: Commit and push prediction CSV to repository
+        run: |
+          git config --local user.email "atodorov284@gmail.com"
+          git config --local user.name "WorkflowBotAlex"
+          git pull
+          git add data/model_predictions/prediction_data.csv
+          git add data/model_predictions/last_three_days.csv
+          git commit -m "Update prediction data" || echo "No changes to commit"
+          git push origin deploy
+
+  sync-to-hub:
+    runs-on: windows-latest
+    needs: fetch-and-predict # Ensures this job runs after fetch-and-predict
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Git pull
+        run: git pull
+      - name: Install Git LFS
+        run: git lfs install
+      - name: Sync history with LFS
+        run: git lfs migrate import --include="*.xgb, *.pkl" --yes --everything
+      - name: Push to hub
+        env:
+          HF: ${{ secrets.HF }}
+        run: git push --force https://03chrisk:${{ secrets.HF }}@huggingface.co/spaces/03chrisk/air-quality-forecasting deploy:main

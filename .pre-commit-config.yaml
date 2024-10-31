@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-case-conflict # checks for files that would conflict in case-insensitive filesystems.
+      - id: check-merge-conflict # checks for files that contain merge conflict strings.
+      - id: check-yaml # checks yaml files for parseable syntax.
+      - id: detect-private-key # detects the presence of private keys.
+      - id: end-of-file-fixer # ensures that a file is either empty, or ends with one newline.
+      - id: fix-byte-order-marker # removes utf-8 byte order marker.
+      - id: mixed-line-ending # replaces or checks mixed line ending.
+      - id: requirements-txt-fixer # sorts entries in requirements.txt.
+      - id: trailing-whitespace # trims trailing whitespace.
+
+  - repo: https://github.com/hadialqattan/pycln
+    rev: v2.1.1
+    hooks:
+      - id: pycln
+        args: [--all]

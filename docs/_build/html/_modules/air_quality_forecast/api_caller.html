@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>air_quality_forecast.api_caller &mdash; Air Quality Forecast  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Air Quality Forecast
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">air-quality-forecast</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Air Quality Forecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">air_quality_forecast.api_caller</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for air_quality_forecast.api_caller</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<div class="viewcode-block" id="APICaller">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.api_caller.APICaller">[docs]</a>
+<span class="k">class</span> <span class="nc">APICaller</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the APICaller class. Gets the luchtmeet data for the griftpark and erzeijstraat stations.</span>
+<span class="sd">        Also can merge the data and present it in a lagged format for the model&#39;s input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_luchtmeet_griftpark</span> <span class="o">=</span> <span class="s2">&quot;NL10643&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_luchtmeet_erzeijstraat</span> <span class="o">=</span> <span class="s2">&quot;NL10639&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_base_luchtmeet_url</span> <span class="o">=</span> <span class="s2">&quot;https://api.luchtmeetnet.nl/open_api/measurements&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_components_griftpark</span> <span class="o">=</span> <span class="s2">&quot;O3,NO2,PM25&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_components_erzeijstraat</span> <span class="o">=</span> <span class="s2">&quot;PM10&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vc_base_url</span> <span class="o">=</span> <span class="s2">&quot;https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/weatherdata/history&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vc_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;VC_KEY&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vc_key</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vc_key</span> <span class="o">=</span> <span class="s2">&quot;3LBMJ7SAH5BCSL5H2DYS5YQ5K&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vc_max_wait</span> <span class="o">=</span> <span class="mi">30</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_successful_request_code</span> <span class="o">=</span> <span class="mi">200</span>
+
+<div class="viewcode-block" id="APICaller._current_time">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.api_caller.APICaller._current_time">[docs]</a>
+    <span class="k">def</span> <span class="nf">_current_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the current time in the format &quot;YYYY-MM-DD HH:MM:SS&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="APICaller._two_days_ago">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.api_caller.APICaller._two_days_ago">[docs]</a>
+    <span class="k">def</span> <span class="nf">_two_days_ago</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the date and time three days before the current time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="APICaller._get_luchtmeet_data">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.api_caller.APICaller._get_luchtmeet_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_luchtmeet_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">components</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">station_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetches luchtmeet data for a specific formula from the API over the past three days.</span>
+
+<span class="sd">        :param components: The components to query (e.g., &#39;O3,NO2,PM25&#39;).</span>
+<span class="sd">        :param station_number: The station number to query.</span>
+<span class="sd">        :return: List of JSON data from the API response for the given components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_time</span><span class="p">()</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_two_days_ago</span><span class="p">()</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_luchtmeet_url</span><span class="si">}</span><span class="s2">?station_number=</span><span class="si">{</span><span class="n">station_number</span><span class="si">}</span><span class="s2">&amp;components=</span><span class="si">{</span><span class="n">components</span><span class="si">}</span><span class="s2">&amp;page=1&amp;order_by=timestamp_measured&amp;order_direction=desc&amp;start=</span><span class="si">{</span><span class="n">start_time</span><span class="si">}</span><span class="s2">&amp;end=</span><span class="si">{</span><span class="n">end_time</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_successful_request_code</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;API request failed with status code: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="APICaller.get_luchtmeet_data">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.api_caller.APICaller.get_luchtmeet_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_luchtmeet_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Averages out the luchtmeet data for all required formulas over the past three days.</span>
+
+<span class="sd">        :return: A pandas DataFrame with daily averaged data for each formula.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_data</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Loop over each formula and fetch the data</span>
+        <span class="n">griftpark_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_luchtmeet_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_components_griftpark</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_luchtmeet_griftpark</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">griftpark_data</span><span class="p">:</span>
+            <span class="n">all_data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">griftpark_data</span><span class="p">)</span>
+
+        <span class="n">erzeijstraat_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_luchtmeet_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_components_erzeijstraat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_luchtmeet_erzeijstraat</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">erzeijstraat_data</span><span class="p">:</span>
+            <span class="n">all_data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">erzeijstraat_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">all_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No data retrieved from the API.&quot;</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">all_data</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;timestamp_measured&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;timestamp_measured&quot;</span><span class="p">])</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;timestamp_measured&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span>
+
+        <span class="n">df_avg</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;formula&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;mean&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">df_pivot</span> <span class="o">=</span> <span class="n">df_avg</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;formula&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">&quot;value&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">df_pivot</span> <span class="o">=</span> <span class="n">df_pivot</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># This is needed as NO2 also extracts NO...</span>
+        <span class="n">df_pivot</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df_pivot</span> <span class="o">=</span> <span class="n">df_pivot</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df_pivot</span></div>
+
+
+<div class="viewcode-block" id="APICaller.get_vc_data">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.api_caller.APICaller.get_vc_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_vc_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetches weather data for Utrecht for the last three days from Visual Crossing API.</span>
+
+<span class="sd">        :return: A pandas DataFrame with the weather data for the last three days.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_two_days_ago</span><span class="p">()</span>
+        <span class="n">end_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_time</span><span class="p">()</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_vc_base_url</span><span class="si">}</span><span class="s2">?&amp;aggregateHours=24&amp;startDateTime=</span><span class="si">{</span><span class="n">start_date</span><span class="si">}</span><span class="s2">&amp;endDateTime=</span><span class="si">{</span><span class="n">end_date</span><span class="si">}</span><span class="s2">&amp;unitGroup=metric&amp;contentType=json&amp;dayStartTime=0:0:00&amp;dayEndTime=0:0:00&amp;location=Utrecht&amp;key=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_vc_key</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_vc_max_wait</span><span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_successful_request_code</span><span class="p">:</span>
+                <span class="n">selected_columns</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="s2">&quot;datetimeStr&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;temp&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;humidity&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;visibility&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;solarradiation&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;precip&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;wspd&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;wdir&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;locations&quot;</span><span class="p">][</span><span class="s2">&quot;Utrecht&quot;</span><span class="p">][</span><span class="s2">&quot;values&quot;</span><span class="p">])</span>
+
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">selected_columns</span><span class="p">)</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">selected_columns</span><span class="p">]</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;datetimeStr&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">date</span>
+
+                <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">df</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed. Status code: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">http_err</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HTTP error occurred: </span><span class="si">{</span><span class="n">http_err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Other error occurred: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="APICaller.lag_data">
+<a class="viewcode-back" href="../../air_quality_forecast.html#air_quality_forecast.api_caller.APICaller.lag_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">lag_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lag the air quality and weather data into a single row.</span>
+
+<span class="sd">        :return: DataFrame with lagged data in a single row.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">air_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_luchtmeet_data</span><span class="p">()</span>
+        <span class="n">weather_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vc_data</span><span class="p">()</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">air_data</span><span class="p">,</span> <span class="n">weather_data</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;date&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Need to reindex for model</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;PM25&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;PM10&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;O3&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;NO2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;temp&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;humidity&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;visibility&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;solarradiation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;precip&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;wspd&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;wdir&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">flattened</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="n">new_column_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">day_offset</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">new_column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2"> - day </span><span class="si">{</span><span class="n">day_offset</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">lagged_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">flattened</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">new_column_names</span><span class="p">)</span>
+
+        <span class="n">lagged_df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y&quot;</span><span class="p">))</span>
+
+        <span class="n">lagged_df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lagged_df</span></div>
+</div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">caller</span> <span class="o">=</span> <span class="n">APICaller</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">caller</span><span class="o">.</span><span class="n">lag_data</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Aleksandar Todorov, Christian Kobriger, Lukasz Sawala, Csenge Szoke.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

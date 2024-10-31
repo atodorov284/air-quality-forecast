@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>streamlit_src.views.admin_view &mdash; Air Quality Forecast  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            Air Quality Forecast
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">air-quality-forecast</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Air Quality Forecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">streamlit_src.views.admin_view</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for streamlit_src.views.admin_view</h1><div class="highlight"><pre>
+<span></span><span class="c1"># views/user_view.py</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+<span class="kn">from</span> <span class="nn">views.user_view</span> <span class="kn">import</span> <span class="n">UserView</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+
+
+<div class="viewcode-block" id="AdminView">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.admin_view.AdminView">[docs]</a>
+<span class="k">class</span> <span class="nc">AdminView</span><span class="p">(</span><span class="n">UserView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to handle all user interface elements for the admin.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the AdminView class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="AdminView.show_admin_pages">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.admin_view.AdminView.show_admin_pages">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_admin_pages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays a dropdown for selecting different admin pages.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The selected page from the dropdown.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">selectbox</span><span class="p">(</span>
+            <span class="s2">&quot;Select a page:&quot;</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;Display Predictions&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Make Predictions&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Feature Importances&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Model Metrics&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">page</span></div>
+
+
+<div class="viewcode-block" id="AdminView.display_feature_importance">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.admin_view.AdminView.display_feature_importance">[docs]</a>
+    <span class="k">def</span> <span class="nf">display_feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_importances</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays the feature importance graph using Plotly for better aesthetics.</span>
+
+<span class="sd">        :param features: A list of feature names.</span>
+<span class="sd">        :param importance_values: A list of corresponding importance values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Creating a DataFrame for better visualization with Plotly</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+            <span class="n">feature_importances</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Importance&quot;</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+            <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;h&quot;</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Feature Importance for Predictor Variables&quot;</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Importance&quot;</span><span class="p">:</span> <span class="s2">&quot;Mean Absolute SHAP&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Feature&quot;</span><span class="p">:</span> <span class="s2">&quot;Predictor Variables&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;Importance&quot;</span><span class="p">,</span>
+            <span class="n">color_continuous_scale</span><span class="o">=</span><span class="s2">&quot;Cividis&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+
+        <span class="n">st</span><span class="o">.</span><span class="n">plotly_chart</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdminView.upload_dataset">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.admin_view.AdminView.upload_dataset">[docs]</a>
+    <span class="k">def</span> <span class="nf">upload_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Uploads a dataset for prediction.</span>
+
+<span class="sd">        :return: A pandas DataFrame containing the uploaded dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">st</span><span class="o">.</span><span class="n">file_uploader</span><span class="p">(</span><span class="s2">&quot;Choose a CSV file&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="AdminView.upload_instructions">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.admin_view.AdminView.upload_instructions">[docs]</a>
+    <span class="k">def</span> <span class="nf">upload_instructions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays instructions for uploading a dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s2">&quot;Upload Dataset for Prediction&quot;</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span>
+            <span class="s2">&quot;Make your own custom predictions using a dataset. Note that the dataset has to adhere to the following:&quot;</span>
+        <span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    - **Normalization**: The data must be **unnormalized**.</span>
+<span class="s2">    - **Units**: All measurements should as specified below**.</span>
+<span class="s2">    - **Data Structure**: The dataset must contain a total of **33 columns** (34 with date) with the following order:</span>
+<span class="s2">        - **Optional**: `date`</span>
+<span class="s2">        - `PM25` (today)</span>
+<span class="s2">        - `PM10` (today)</span>
+<span class="s2">        - `O3` (today)</span>
+<span class="s2">        - `NO2` (today)</span>
+<span class="s2">        - `Temperature` (today)</span>
+<span class="s2">        - `Humidity` (today)</span>
+<span class="s2">        - `Visibility` (today)</span>
+<span class="s2">        - `Solar Radiation` (today)</span>
+<span class="s2">        - `Precipitation` (today)</span>
+<span class="s2">        - `Wind Speed` (today)</span>
+<span class="s2">        - `Wind Direction` (today)</span>
+<span class="s2">        - `PM25` (yesterday)</span>
+<span class="s2">        - `PM10` (yesterday)</span>
+<span class="s2">        - `O3` (yesterday)</span>
+<span class="s2">        - `NO2` (yesterday)</span>
+<span class="s2">        - `Temperature` (yesterday)</span>
+<span class="s2">        - `Humidity` (yesterday)</span>
+<span class="s2">        - `Visibility` (yesterday)</span>
+<span class="s2">        - `Solar Radiation` (yesterday)</span>
+<span class="s2">        - `Precipitation` (yesterday)</span>
+<span class="s2">        - `Wind Speed` (yesterday)</span>
+<span class="s2">        - `Wind Direction` (yesterday)</span>
+<span class="s2">        - `PM25` (two days ago)</span>
+<span class="s2">        - `PM10` (two days ago)</span>
+<span class="s2">        - `O3` (two days ago)</span>
+<span class="s2">        - `NO2` (two days ago)</span>
+<span class="s2">        - `Temperature` (two days ago)</span>
+<span class="s2">        - `Humidity` (two days ago)</span>
+<span class="s2">        - `Visibility` (two days ago)</span>
+<span class="s2">        - `Solar Radiation` (two days ago)</span>
+<span class="s2">        - `Precipitation` (two days ago)</span>
+<span class="s2">        - `Wind Speed` (two days ago)</span>
+<span class="s2">        - `Wind Direction` (two days ago)</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdminView.download_button">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.admin_view.AdminView.download_button">[docs]</a>
+    <span class="k">def</span> <span class="nf">download_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a download button for the user to download the data.</span>
+
+<span class="sd">        :param label: The label of the button.</span>
+<span class="sd">        :param data: The data to be downloaded.</span>
+<span class="sd">        :param file_name: The name of the file to be downloaded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">download_button</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">file_name</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span>
+            <span class="n">mime</span><span class="o">=</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdminView.confirm_checks">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.admin_view.AdminView.confirm_checks">[docs]</a>
+    <span class="k">def</span> <span class="nf">confirm_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checks</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays a confirmation checkbox for the user to confirm the requirements.</span>
+
+<span class="sd">        :param checks: A dictionary of requirements and their current values.</span>
+<span class="sd">        :return: True if all the requirements are confirmed, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;Select the requirements that have been checked:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">requirement</span> <span class="ow">in</span> <span class="n">checks</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">checks</span><span class="p">[</span><span class="n">requirement</span><span class="p">]</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">checkbox</span><span class="p">(</span><span class="n">requirement</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">checks</span><span class="p">[</span><span class="n">requirement</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">checks</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="AdminView.display_datatable">
+<a class="viewcode-back" href="../../../streamlit_src.views.html#streamlit_src.views.admin_view.AdminView.display_datatable">[docs]</a>
+    <span class="k">def</span> <span class="nf">display_datatable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays a table of the data.</span>
+
+<span class="sd">        :param data: The data to be displayed.</span>
+<span class="sd">        :param message: The message to be displayed above the table.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">dataframe</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Aleksandar Todorov, Christian Kobriger, Lukasz Sawala, Csenge Szoke.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

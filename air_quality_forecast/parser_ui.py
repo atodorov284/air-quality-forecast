@@ -184,7 +184,7 @@ def main():
         if model == "random_forest":
             y_pred = predictor.random_forest_predictions(predict_dataset)
         if model == "xgboost":
-            y_pred = predictor.xgb_predictions(predict_dataset)
+            y_pred = predictor.xgb_predictions(predict_dataset, normalized=True)
 
         print(pd.DataFrame(y_pred).head())
 

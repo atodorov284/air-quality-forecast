@@ -1,0 +1,229 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Air Quality Forecast documentation &mdash; Air Quality Forecast  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="air-quality-forecast" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Air Quality Forecast
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">air-quality-forecast</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Air Quality Forecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Air Quality Forecast documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="air-quality-forecast-documentation">
+<h1>Air Quality Forecast documentation<a class="headerlink" href="#air-quality-forecast-documentation" title="Link to this heading"></a></h1>
+<section id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Link to this heading"></a></h2>
+<p>The objective of this project is to develop an air quality forecasting system that predicts future air quality levels based on historical environmental data. The system is required to provide accurate predictions and offer a user-friendly interface for interaction. The solution consists of a backend for data processing and machine learning, and a frontend built with Streamlit for displaying results.</p>
+</section>
+<section id="project-structure">
+<h2>Project Structure<a class="headerlink" href="#project-structure" title="Link to this heading"></a></h2>
+<section id="codebase">
+<h3>Codebase<a class="headerlink" href="#codebase" title="Link to this heading"></a></h3>
+<p>The code is organized into two main directories:</p>
+<ul class="simple">
+<li><p><cite>streamlit_src/</cite>: Contains the Streamlit views for the web interface.</p></li>
+<li><p><cite>air_quality_forecast/</cite>: Contains the backend logic for data pipeline, prediction models, and utility functions.</p></li>
+</ul>
+</section>
+<section id="directory-breakdown">
+<h3>Directory Breakdown<a class="headerlink" href="#directory-breakdown" title="Link to this heading"></a></h3>
+<ol class="arabic">
+<li><p><code class="docutils literal notranslate"><span class="pre">streamlit_src/</span></code>
+This directory handles the user interface and interactions via Streamlit.
+It uses the Model-View-Controller (MVC) design pattern for separation of logic.</p>
+<ul class="simple">
+<li><p><cite>controllers/</cite>: Contains logic for handling JSON interactions.</p></li>
+<li><p><cite>models/</cite>: Placeholder directory for any future model handling within the frontend.</p></li>
+<li><p><cite>views/</cite>: Contains the view files for the web interface, organized as per different user views.</p></li>
+</ul>
+<p><strong>Files in `views/`:</strong></p>
+<ul class="simple">
+<li><p><cite>admin_view.py</cite>: Handles the admin-specific views.</p></li>
+<li><p><cite>home_view.py</cite>: Manages the homepage view for regular users.</p></li>
+<li><p><cite>user_view.py</cite>: Manages the user interface for general users.</p></li>
+<li><p><cite>app.py</cite>: The main entry point for launching the Streamlit application.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">air_quality_forecast/</span></code>
+This directory contains the core functionality for the air quality forecasting and the pipelines used during the data engineering and model development stages.
+The Streamlit app only accesses <cite>prediction.py</cite>.</p>
+<ul class="simple">
+<li><p><cite>api_caller.py</cite>: Defines logic for interacting with external APIs (such as fetching external data). Used in the CI/CD workflows.</p></li>
+<li><p><cite>data_pipeline.py</cite>: Handles data collection, transformation, and preprocessing steps.</p></li>
+<li><p><cite>get_prediction_data.py</cite>: Retrieves and processes prediction data for display.</p></li>
+<li><p><cite>main.py</cite>: Entry point for executing backend operations.</p></li>
+<li><p><cite>model_development.py</cite>: Defines and trains the machine learning model used for air quality prediction.</p></li>
+<li><p><cite>parser_ui.py</cite>: Manages any parsing related to the UI input. Contains a custom prediction and a retrain protocol.</p></li>
+<li><p><cite>prediction.py</cite>: Contains functions for running predictions based on the trained model. Can load models, perform validation, and output predictions.</p></li>
+<li><p><cite>utils.py</cite>: Contains utility functions used across the backend.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<section id="workflow">
+<h2>Workflow<a class="headerlink" href="#workflow" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p><strong>Data Collection &amp; Preprocessing</strong>:</p>
+<p>The <cite>data_pipeline.py</cite> script handles the data collection from various sources and transforms it into a suitable format for model training and inference.
+External APIs are utilized for real-time data through <cite>api_caller.py</cite>.</p>
+</li>
+<li><p><strong>Model Development</strong>:</p>
+<p>In <cite>model_development.py</cite>, the machine learning model is developed using techniques such as decision trees, random forests, or other appropriate algorithms. The model is trained using historical air quality data.</p>
+</li>
+<li><p><strong>Prediction</strong>:</p>
+<p>After the model is trained, predictions can be made using the <cite>prediction.py</cite> script. It loads the trained model and provides air quality forecasts based on the incoming data.</p>
+</li>
+<li><p><strong>Streamlit Interface</strong>:</p>
+<p>The <cite>views/</cite> directory contains the frontend built with Streamlit. Users interact with the application through the homepage (<cite>home_view.py</cite>) or admin page (<cite>admin_view.py</cite>). The main application is launched via <cite>app.py</cite>, which brings together all views and backend interactions.</p>
+</li>
+</ol>
+</section>
+<section id="deployment">
+<h2>Deployment<a class="headerlink" href="#deployment" title="Link to this heading"></a></h2>
+<p>The web application is deployed using Streamlit. To run the app locally, you can execute the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>streamlit<span class="w"> </span>run<span class="w"> </span>./streamlit_src/views/app.py
+</pre></div>
+</div>
+<p>The app integrates both backend logic (for fetching and processing data) and frontend views, providing real-time air quality predictions to users.</p>
+</section>
+<section id="retraining-protocol">
+<h2>Retraining Protocol<a class="headerlink" href="#retraining-protocol" title="Link to this heading"></a></h2>
+<p>Run <cite>main.py</cite> to access the parser information. After changing the hyperparameter search spaces in <cite>configs/hyperparameter_search_spaces.yaml</cite>, you can choose which model to train or retrain with the command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>main.py<span class="w"> </span>--retrain<span class="w"> </span>x_train_path<span class="w"> </span>y_train_path<span class="w"> </span>x_test_path<span class="w"> </span>y_test_path<span class="w"> </span>n_iter
+</pre></div>
+</div>
+<p>By specifying the paths to the data in the placeholders.</p>
+<p>Alternatively, one can make a custom prediction locally by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>main.py<span class="w"> </span>--predict<span class="w"> </span>prediction_path
+</pre></div>
+</div>
+<p>Note that the prediction dataset has to obey certain requirements, specified in the admin dashboard (easier prediction from there).</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">air-quality-forecast</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="air_quality_forecast.html">air_quality_forecast package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="air_quality_forecast.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="air_quality_forecast.html#module-air_quality_forecast.api_caller">air_quality_forecast.api_caller module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="air_quality_forecast.html#module-air_quality_forecast.data_pipeline">air_quality_forecast.data_pipeline module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="air_quality_forecast.html#module-air_quality_forecast.get_prediction_data">air_quality_forecast.get_prediction_data module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="air_quality_forecast.html#module-air_quality_forecast.main">air_quality_forecast.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="air_quality_forecast.html#module-air_quality_forecast.model_development">air_quality_forecast.model_development module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="air_quality_forecast.html#module-air_quality_forecast.parser_ui">air_quality_forecast.parser_ui module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="air_quality_forecast.html#module-air_quality_forecast.prediction">air_quality_forecast.prediction module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="air_quality_forecast.html#module-air_quality_forecast.utils">air_quality_forecast.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="air_quality_forecast.html#module-air_quality_forecast">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="streamlit_src.html">streamlit_src package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="streamlit_src.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="streamlit_src.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="streamlit_src.html#module-streamlit_src.app">streamlit_src.app module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="streamlit_src.html#module-streamlit_src">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-right" title="air-quality-forecast" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Aleksandar Todorov, Christian Kobriger, Lukasz Sawala, Csenge Szoke.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,377 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>streamlit_src.models.air_quality_model &mdash; Air Quality Forecast  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            Air Quality Forecast
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">air-quality-forecast</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Air Quality Forecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">streamlit_src.models.air_quality_model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for streamlit_src.models.air_quality_model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">root_mean_squared_error</span>
+
+<span class="n">PREDICTION_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))),</span>
+    <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;model_predictions&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;prediction_data.csv&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">PAST_DATA_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))),</span>
+    <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;model_predictions&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_three_days.csv&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="AirQualityModel">
+<a class="viewcode-back" href="../../../streamlit_src.models.html#streamlit_src.models.air_quality_model.AirQualityModel">[docs]</a>
+<span class="k">class</span> <span class="nc">AirQualityModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that loads the air quality model and makes predictions.</span>
+<span class="sd">    </span>
+<span class="sd">    The model is loaded from a pickle file located at PREDICTION_PATH.</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _WHO_NO2_LEVEL : int</span>
+<span class="sd">        The WHO air quality level for NO2 in micrograms per cubic meter.</span>
+<span class="sd">    _WHO_O3_LEVEL : int</span>
+<span class="sd">        The WHO air quality level for O3 in micrograms per cubic meter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_WHO_NO2_LEVEL</span> <span class="o">=</span> <span class="mi">25</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_WHO_O3_LEVEL</span> <span class="o">=</span> <span class="mi">100</span>
+
+<div class="viewcode-block" id="AirQualityModel.get_today_data">
+<a class="viewcode-back" href="../../../streamlit_src.models.html#streamlit_src.models.air_quality_model.AirQualityModel.get_today_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_today_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the air quality data for today from the past 3 days data.</span>
+
+<span class="sd">        The data is obtained from a CSV file located at PAST_DATA_PATH.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.Series</span>
+<span class="sd">            A pandas Series with the air quality data for today.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">last_three_days</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_three_days</span><span class="p">()</span>
+        <span class="n">today</span> <span class="o">=</span> <span class="n">last_three_days</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">today</span></div>
+
+
+<div class="viewcode-block" id="AirQualityModel.next_three_day_predictions">
+<a class="viewcode-back" href="../../../streamlit_src.models.html#streamlit_src.models.air_quality_model.AirQualityModel.next_three_day_predictions">[docs]</a>
+    <span class="k">def</span> <span class="nf">next_three_day_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the predictions for the next three days.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">PREDICTION_PATH</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)]</span>
+
+        <span class="n">next_three_days</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;Day&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Day 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Day 2&quot;</span><span class="p">,</span> <span class="s2">&quot;Day 3&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;NO2 (µg/m³)&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;NO2 + day 1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;NO2 + day 2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;NO2 + day 3&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;O3 (µg/m³)&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;O3 + day 1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;O3 + day 2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;O3 + day 3&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">next_three_days</span></div>
+
+
+<div class="viewcode-block" id="AirQualityModel.get_all_data_last_three_days">
+<a class="viewcode-back" href="../../../streamlit_src.models.html#streamlit_src.models.air_quality_model.AirQualityModel.get_all_data_last_three_days">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_all_data_last_three_days</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns all the air quality data for the last three days from the past 3 days data.</span>
+<span class="sd">        </span>
+<span class="sd">        The data is obtained from a CSV file located at PAST_DATA_PATH.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame with the air quality data for the last three days.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">PAST_DATA_PATH</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="AirQualityModel.get_last_three_days">
+<a class="viewcode-back" href="../../../streamlit_src.models.html#streamlit_src.models.air_quality_model.AirQualityModel.get_last_three_days">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_last_three_days</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns all the air quality data for the last three days from the past 3 days data.</span>
+<span class="sd">        </span>
+<span class="sd">        The data is obtained from a CSV file located at PAST_DATA_PATH.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame with the air quality data for the last three days.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Extract NO2 and O3 values for the last three days</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">PAST_DATA_PATH</span><span class="p">)</span>
+        <span class="n">last_three_days</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;Day&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Today&quot;</span><span class="p">,</span> <span class="s2">&quot;Yesterday&quot;</span><span class="p">,</span> <span class="s2">&quot;Day Before Yesterday&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;NO2 (µg/m³)&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;NO2 - day 0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;NO2 - day 1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;NO2 - day 2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;O3 (µg/m³)&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;O3 - day 0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;O3 - day 1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;O3 - day 2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">last_three_days</span></div>
+
+
+<div class="viewcode-block" id="AirQualityModel.calculate_metrics">
+<a class="viewcode-back" href="../../../streamlit_src.models.html#streamlit_src.models.air_quality_model.AirQualityModel.calculate_metrics">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the root mean squared error for the predictions of the last three days.</span>
+<span class="sd">        </span>
+<span class="sd">        The data is obtained from a CSV file located at PREDICTION_PATH.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame with the root mean squared error for the predictions of the last three days.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model_predictions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">PREDICTION_PATH</span><span class="p">)</span>
+
+        <span class="n">yesterday</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">two_days_ago</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">three_days_ago</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">yesterday_prediction</span> <span class="o">=</span> <span class="n">model_predictions</span><span class="p">[</span><span class="n">model_predictions</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">yesterday</span><span class="p">]</span>
+        <span class="n">two_days_ago_prediction</span> <span class="o">=</span> <span class="n">model_predictions</span><span class="p">[</span>
+            <span class="n">model_predictions</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">two_days_ago</span>
+        <span class="p">]</span>
+        <span class="n">three_days_ago_prediction</span> <span class="o">=</span> <span class="n">model_predictions</span><span class="p">[</span>
+            <span class="n">model_predictions</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">three_days_ago</span>
+        <span class="p">]</span>
+
+        <span class="n">current_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">PAST_DATA_PATH</span><span class="p">)</span>
+
+        <span class="n">current_data</span> <span class="o">=</span> <span class="n">current_data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;NO2 - day 0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;O3 - day 0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;NO2 - day 1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;O3 - day 1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;NO2 - day 2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;O3 - day 2&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">today_ozone_prediction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;O3 Actual Value&quot;</span><span class="p">:</span> <span class="n">current_data</span><span class="p">[</span><span class="s2">&quot;O3 - day 0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;Latest Model Prediction for O3&quot;</span><span class="p">:</span> <span class="n">yesterday_prediction</span><span class="p">[</span>
+                    <span class="s2">&quot;O3 + day 1&quot;</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">yesterday</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">today_nitrogen_dioxide_prediction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;NO2 Actual Value&quot;</span><span class="p">:</span> <span class="n">current_data</span><span class="p">[</span><span class="s2">&quot;NO2 - day 0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;Latest Model Prediction for NO2&quot;</span><span class="p">:</span> <span class="n">yesterday_prediction</span><span class="p">[</span>
+                    <span class="s2">&quot;NO2 + day 1&quot;</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">yesterday</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">today_full_row</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">today_ozone_prediction</span><span class="p">,</span> <span class="n">today_nitrogen_dioxide_prediction</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="n">yesterday_ozone_prediction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;O3 Actual Value&quot;</span><span class="p">:</span> <span class="n">current_data</span><span class="p">[</span><span class="s2">&quot;O3 - day 1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;Latest Model Prediction for O3&quot;</span><span class="p">:</span> <span class="n">two_days_ago_prediction</span><span class="p">[</span>
+                    <span class="s2">&quot;O3 + day 1&quot;</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">two_days_ago</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">yesterday_nitrogen_dioxide_prediction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;NO2 Actual Value&quot;</span><span class="p">:</span> <span class="n">current_data</span><span class="p">[</span><span class="s2">&quot;NO2 - day 1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;Latest Model Prediction for NO2&quot;</span><span class="p">:</span> <span class="n">two_days_ago_prediction</span><span class="p">[</span>
+                    <span class="s2">&quot;NO2 + day 1&quot;</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">two_days_ago</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">yesterday_full_row</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">yesterday_ozone_prediction</span><span class="p">,</span> <span class="n">yesterday_nitrogen_dioxide_prediction</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="n">two_days_ago_ozone_prediction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;O3 Actual Value&quot;</span><span class="p">:</span> <span class="n">current_data</span><span class="p">[</span><span class="s2">&quot;O3 - day 2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;Latest Model Prediction for O3&quot;</span><span class="p">:</span> <span class="n">three_days_ago_prediction</span><span class="p">[</span>
+                    <span class="s2">&quot;O3 + day 1&quot;</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">three_days_ago</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">two_days_ago_nitrogen_dioxide</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;NO2 Actual Value&quot;</span><span class="p">:</span> <span class="n">current_data</span><span class="p">[</span><span class="s2">&quot;NO2 - day 2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;Latest Model Prediction for NO2&quot;</span><span class="p">:</span> <span class="n">three_days_ago_prediction</span><span class="p">[</span>
+                    <span class="s2">&quot;NO2 + day 1&quot;</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">three_days_ago</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">two_days_ago_full_row</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">two_days_ago_ozone_prediction</span><span class="p">,</span> <span class="n">two_days_ago_nitrogen_dioxide</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="n">full_metrics_last_three_days</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">today_full_row</span><span class="p">,</span> <span class="n">yesterday_full_row</span><span class="p">,</span> <span class="n">two_days_ago_full_row</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+
+        <span class="n">full_metrics_last_three_days</span><span class="p">[</span><span class="s2">&quot;O3 RMSE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_metrics_last_three_days</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">root_mean_squared_error</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;O3 Actual Value&quot;</span><span class="p">]],</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;Latest Model Prediction for O3&quot;</span><span class="p">]]</span>
+            <span class="p">),</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">full_metrics_last_three_days</span><span class="p">[</span><span class="s2">&quot;NO2 RMSE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_metrics_last_three_days</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">root_mean_squared_error</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;NO2 Actual Value&quot;</span><span class="p">]],</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;Latest Model Prediction for NO2&quot;</span><span class="p">]]</span>
+            <span class="p">),</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">full_metrics_last_three_days</span> <span class="o">=</span> <span class="n">full_metrics_last_three_days</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;O3 Actual Value&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Latest Model Prediction for O3&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;O3 RMSE&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;NO2 Actual Value&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Latest Model Prediction for NO2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;NO2 RMSE&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">full_metrics_last_three_days</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Aleksandar Todorov, Christian Kobriger, Lukasz Sawala, Csenge Szoke.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>
