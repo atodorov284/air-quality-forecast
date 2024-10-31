@@ -15,7 +15,7 @@ pinned: false
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-Air pollution is a significant environmental concern, especially in urban areas, where the high levels of nitrogen dioxide and ozone can have a negative impact on human health, the ecosystem and on the overall quality of life. Given these risks, monitoring and forecasting the level of air pollution is an important task in order to allow for timely actions to reduce the harmful effects. 
+Air pollution is a significant environmental concern, especially in urban areas, where the high levels of nitrogen dioxide and ozone can have a negative impact on human health, the ecosystem and on the overall quality of life. Given these risks, monitoring and forecasting the level of air pollution is an important task in order to allow for timely actions to reduce the harmful effects.
 
 In the Netherlands, cities like Utrecht experience challenges concerning air quality due to urbanization, transportation, and industrial activities. Developing a system that can provide accurate and robust real-time air quality monitoring and reliable forecasts for future pollution levels would allow authorities and residents to take preventive measures and adjust their future activities based on expected air quality. This project focuses on the time-series forecasting of air pollution levels, specifically NO<sub>2</sub> and O<sub>3</sub> concentrations, for the next three days. This task can be framed as a regression problem, where the goal is to predict continuous values based on historical environmental data. Moreover, it provides infrastructure for real-time prediction, based on recent measurements.
 
@@ -37,11 +37,11 @@ To launch the Utrecht Air Quality Monitoring application on a localhost, follow 
    streamlit run app.py
 > [!TIP]
 > **Alternative Path**: If you are not in the `streamlit_src` folder, provide the full path to `app.py`. For example, from the root directory:
-> - **Windows**: 
+> - **Windows**:
 >   ```bash
 >   streamlit run .\streamlit_src\app.py
 >   ```
-> - **macOS/Linux**: 
+> - **macOS/Linux**:
 >   ```bash
 >   streamlit run ./streamlit_src/app.py
 >   ```
@@ -69,7 +69,7 @@ First, navigate to the `air-quality-forecast` folder, which contains the source 
 ```bash
 cd air_quality_forecast
 ```
-**📊 View the MLFlow Dashboard**: 
+**📊 View the MLFlow Dashboard**:
 To track experiments, run `model_development.py`, which will start an MLFlow server on `localhost` at port `5000`.
 
 ```bash
@@ -120,7 +120,7 @@ start index.html  # Windows
 │   ├── processed         <- The final, canonical data sets for modeling. Contains the train-test split.
 │   └── raw               <- The original, immutable data dump.
 │
-├── .github               <- Contains automated workflows for reproducibility, flake8 checks, and scheduled updates. 
+├── .github               <- Contains automated workflows for reproducibility, flake8 checks, and scheduled updates.
 │
 ├── docs                  <- Contains files to make the HTML documentation for this project using Sphinx
 │
@@ -130,7 +130,7 @@ start index.html  # Windows
 │
 ├── notebooks             <- Scratch Jupyter notebooks (not to be evaluated, source code is in air-quality-forecast)
 │
-├── pyproject.toml        <- Project configuration file with package metadata for 
+├── pyproject.toml        <- Project configuration file with package metadata for
 │                            air-quality-forecast and configuration for tools like black
 │
 ├── reports               <- Generated analysis as HTML, PDF, LaTeX, etc.
@@ -164,4 +164,3 @@ start index.html  # Windows
     └── utils.py                  <- Utility functions for common tasks across scripts
 ```
 ---
-
