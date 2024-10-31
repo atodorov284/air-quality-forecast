@@ -52,17 +52,11 @@ Below are example commands for using the **retraining** and **prediction** funct
 To retrain a model (e.g., `xgboost`) with a specified dataset:
 
 ```bash
-
+python main.py --retrain x_train_path y_train_path x_test_path y_test_path n_iter --model xgboost
 ```
+By specifying the paths to the data in the placeholders.
+
 To generate predictions with a trained model (e.g., `xgboost`) on a new dataset:
 ```bash
-
+python main.py --predict prediction_path --model xgboost
 ```
-
----
-## 🚀 How to Run the Scripts
-
-**Set Up Environment**:
-   Make sure all dependencies are installed by running the following `requirements.txt` file from the repository root:
-   ```bash
-   pip install -r requirements.txt
