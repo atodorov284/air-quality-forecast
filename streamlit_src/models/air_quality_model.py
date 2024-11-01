@@ -65,7 +65,12 @@ class AirQualityModel:
         """
         data = pd.read_csv(PREDICTION_PATH)
 
-        data = data[data["date"] == pd.Timestamp.now().strftime("%Y-%m-%d")]
+        filtered = data[data["date"] == datetime.today().strftime("%Y-%d-%m")]
+
+        if len(filtered) == 0:
+            filtered = data[data["date"] == datetime.today().strftime("%Y-%m-%d")]
+
+        data = filtered
 
         next_three_days = pd.DataFrame(
             {
