@@ -41,7 +41,7 @@ To launch the Utrecht Air Quality Monitoring application on a localhost, follow 
 >   ```bash
 >   streamlit run .\streamlit_src\app.py
 >   ```
-> - **macOS/Linux**:
+> - **macOS / Linux**:
 >   ```bash
 >   streamlit run ./streamlit_src/app.py
 >   ```
