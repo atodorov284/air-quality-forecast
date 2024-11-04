@@ -23,7 +23,7 @@ def main():
         "NO2 + day 3",
         "O3 + day 3",
     ]
-    current_date = pd.Timestamp.today().strftime("%d-%m-%Y")
+    current_date = pd.Timestamp.today().strftime("%Y-%m-%d")
     df.index = pd.DatetimeIndex([current_date])
 
     save_dir = os.path.join(project_root, "data", "model_predictions")
